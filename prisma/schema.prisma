@@ -1,0 +1,121 @@
+generator client {
+  provider        = "prisma-client"
+  output          = "../src/generated/prisma"
+  previewFeatures = ["multiSchema"]
+}
+
+datasource db {
+  provider = "postgresql"
+  schemas  = ["finty"]
+}
+
+enum Role {
+  COLABORADOR
+  ADMINISTRADOR
+
+  @@schema("finty")
+}
+
+enum ExpenseStatus {
+  PENDIENTE
+  APROBADO
+  RECHAZADO
+  PAGADO
+
+  @@schema("finty")
+}
+
+enum Plan {
+  FREE
+  FULL
+
+  @@schema("finty")
+}
+
+model Organization {
+  id        String   @id @default(uuid())
+  name      String
+  slug      String   @unique
+  plan      Plan     @default(FREE)
+  active    Boolean  @default(true)
+  logoUrl   String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  users    User[]
+  expenses Expense[]
+
+  @@schema("finty")
+}
+
+model User {
+  id             String       @id @default(uuid())
+  username       String       @unique
+  password       String
+  name           String
+  email          String?
+  role           Role         @default(COLABORADOR)
+  active         Boolean      @default(true)
+  organizationId String
+  organization   Organization @relation(fields: [organizationId], references: [id])
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+  expenses       Expense[]
+
+  @@index([organizationId])
+  @@schema("finty")
+}
+
+model Expense {
+  id              String        @id @default(uuid())
+  date            DateTime
+  category        String
+  description     String?
+  amount          Float
+  receipt         String?
+  status          ExpenseStatus @default(PENDIENTE)
+  comment         String?
+  lineaNegocio    String        @default("Público")
+  tipoDocumento   String?
+  proveedor       String?
+  numeroDocumento String?
+  moneda          String        @default("CLP")
+  paidAt          DateTime?
+  paymentRef      String?
+  approvedById    String?
+  userId          String
+  user            User          @relation(fields: [userId], references: [id])
+  organizationId  String
+  organization    Organization  @relation(fields: [organizationId], references: [id])
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+  logs            ExpenseLog[]
+
+  @@index([userId])
+  @@index([status])
+  @@index([date])
+  @@index([organizationId])
+  @@schema("finty")
+}
+
+enum ExpenseAction {
+  CREATED
+  UPDATED
+  APPROVED
+  REJECTED
+  PAID
+
+  @@schema("finty")
+}
+
+model ExpenseLog {
+  id        String        @id @default(uuid())
+  expenseId String
+  expense   Expense       @relation(fields: [expenseId], references: [id], onDelete: Cascade)
+  action    ExpenseAction
+  userId    String
+  createdAt DateTime      @default(now())
+
+  @@index([expenseId])
+  @@schema("finty")
+}
