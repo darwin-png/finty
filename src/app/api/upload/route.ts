@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
-import { writeFile, mkdir } from "fs/promises";
-import { join } from "path";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth";
+import { prisma } from "@/lib/prisma";
 import { v4 as uuid } from "uuid";
 
 const ALLOWED_TYPES = [
@@ -12,6 +13,11 @@ const ALLOWED_TYPES = [
 ];
 
 export async function POST(req: NextRequest) {
+  const session = await getServerSession(authOptions);
+  if (!session) {
+    return NextResponse.json({ error: "No autorizado" }, { status: 401 });
+  }
+
   try {
     const formData = await req.formData();
     const file = formData.get("file") as File | null;
@@ -36,17 +42,19 @@ export async function POST(req: NextRequest) {
 
     const bytes = await file.arrayBuffer();
     const buffer = Buffer.from(bytes);
+    const fileId = uuid();
 
-    const ext = file.name.split(".").pop()?.toLowerCase() || "jpg";
-    const filename = `${uuid()}.${ext}`;
+    // Create a placeholder expense to store the file, then update receipt field
+    // Instead, store in a temp table or directly. Since we have receiptData on Expense,
+    // we'll create a temporary holding approach: return the base64 + mime for the client
+    // to send back during expense creation.
+    const base64 = buffer.toString("base64");
 
-    const uploadDir = join(process.cwd(), "public", "uploads");
-    await mkdir(uploadDir, { recursive: true });
-
-    const filepath = join(uploadDir, filename);
-    await writeFile(filepath, buffer);
-
-    return NextResponse.json({ filename: `/uploads/${filename}` });
+    return NextResponse.json({
+      filename: `/api/files/${fileId}`,
+      receiptBase64: base64,
+      receiptMime: file.type,
+    });
   } catch {
     return NextResponse.json({ error: "Error al subir archivo" }, { status: 500 });
   }

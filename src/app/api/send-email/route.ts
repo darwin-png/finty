@@ -2,19 +2,11 @@ import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
-import nodemailer from "nodemailer";
+import { Resend } from "resend";
 import PDFDocument from "pdfkit";
 import { categoryLabels } from "@/lib/categories";
 
-const transporter = nodemailer.createTransport({
-  host: process.env.SMTP_HOST,
-  port: Number(process.env.SMTP_PORT),
-  secure: false,
-  auth: {
-    user: process.env.SMTP_USER,
-    pass: process.env.SMTP_PASS,
-  },
-});
+const resend = new Resend(process.env.RESEND_API_KEY);
 
 function formatCLP(amount: number) {
   return `$${amount.toLocaleString("es-CL")}`;
@@ -148,8 +140,8 @@ export async function POST(req: NextRequest) {
   try {
     const pdfBuffer = await generatePaymentPDF(orgName, user, expenses, total, ref, paidAt);
 
-    await transporter.sendMail({
-      from: process.env.SMTP_FROM,
+    await resend.emails.send({
+      from: "noreply@finty.cl",
       to: user.email,
       subject: `Comprobante de Pago - ${ref}`,
       html: `
@@ -184,7 +176,6 @@ export async function POST(req: NextRequest) {
         {
           filename: `Pago_${user.name.replace(/\s/g, "_")}_${ref}.pdf`,
           content: pdfBuffer,
-          contentType: "application/pdf",
         },
       ],
     });

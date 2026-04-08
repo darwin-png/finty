@@ -31,7 +31,7 @@ async function generateUniqueSlug(baseName: string): Promise<string> {
 
 export async function POST(req: NextRequest) {
   const body = await req.json();
-  const { orgName, name, username, password, plan } = body;
+  const { orgName, name, username, password } = body;
 
   if (!orgName || !name || !username || !password) {
     return NextResponse.json({ error: "Faltan campos obligatorios" }, { status: 400 });
@@ -58,7 +58,7 @@ export async function POST(req: NextRequest) {
         data: {
           name: orgName,
           slug,
-          plan: plan === "FULL" ? "FULL" : "FREE",
+          plan: "FREE",
         },
       });
 

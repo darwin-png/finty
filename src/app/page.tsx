@@ -16,7 +16,7 @@ export default function LandingPage() {
             </nav>
           </div>
           <div className="flex items-center gap-3">
-            <Link href="/login" className="text-sm text-gray-600 hover:text-gray-900 font-medium hidden sm:block">Iniciar Sesión</Link>
+            <Link href="/login" className="text-sm text-gray-600 hover:text-gray-900 font-medium">Iniciar Sesión</Link>
             <Link href="/register" className="text-sm bg-[#4A90D9] text-white px-5 py-2.5 rounded-lg hover:bg-[#3A7BC8] font-semibold transition-colors shadow-sm">
               Prueba Gratis
             </Link>

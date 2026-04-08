@@ -23,6 +23,8 @@ export default function NuevaRendicion() {
     };
   });
   const [receipt, setReceipt] = useState<string | null>(null);
+  const [receiptBase64, setReceiptBase64] = useState<string | null>(null);
+  const [receiptMime, setReceiptMime] = useState<string | null>(null);
   const [preview, setPreview] = useState<string | null>(null);
   const [uploading, setUploading] = useState(false);
   const [saving, setSaving] = useState(false);
@@ -41,6 +43,8 @@ export default function NuevaRendicion() {
       if (!res.ok) throw new Error(data.error);
 
       setReceipt(data.filename);
+      setReceiptBase64(data.receiptBase64);
+      setReceiptMime(data.receiptMime);
       if (file.type.startsWith("image/")) {
         setPreview(URL.createObjectURL(file));
       } else {
@@ -83,7 +87,7 @@ export default function NuevaRendicion() {
       const res = await fetch("/api/expenses", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ ...form, receipt }),
+        body: JSON.stringify({ ...form, receipt, receiptBase64, receiptMime }),
       });
 
       if (!res.ok) {
@@ -116,7 +120,7 @@ export default function NuevaRendicion() {
                 <img src={preview} alt="Comprobante" className="w-full rounded-xl max-h-48 object-cover" />
                 <button
                   type="button"
-                  onClick={() => { setReceipt(null); setPreview(null); }}
+                  onClick={() => { setReceipt(null); setPreview(null); setReceiptBase64(null); setReceiptMime(null); }}
                   className="absolute top-2 right-2 bg-red-600 text-white w-7 h-7 rounded-full text-sm font-bold"
                 >
                   x
@@ -127,7 +131,7 @@ export default function NuevaRendicion() {
             {receipt && !preview && (
               <div className="mb-3 bg-green-50 text-green-700 text-sm p-3 rounded-xl flex items-center justify-between">
                 <span>PDF subido correctamente</span>
-                <button type="button" onClick={() => setReceipt(null)} className="text-red-500 font-bold">x</button>
+                <button type="button" onClick={() => { setReceipt(null); setReceiptBase64(null); setReceiptMime(null); }} className="text-red-500 font-bold">x</button>
               </div>
             )}
 

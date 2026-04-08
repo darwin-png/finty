@@ -73,6 +73,8 @@ model Expense {
   description     String?
   amount          Float
   receipt         String?
+  receiptData     Bytes?
+  receiptMime     String?
   status          ExpenseStatus @default(PENDIENTE)
   comment         String?
   lineaNegocio    String        @default("Público")

@@ -36,10 +36,6 @@ export default function Dashboard() {
 
   useEffect(() => {
     if (status === "authenticated") {
-      if (session?.user?.role === "ADMINISTRADOR") {
-        router.replace("/app/admin");
-        return;
-      }
       fetchExpenses();
     }
   }, [status, session, router]);
@@ -186,7 +182,7 @@ export default function Dashboard() {
                         <div className="text-lg font-bold text-gray-900">{formatCLP(expense.amount)}</div>
                         <div className="flex gap-2 mt-2">
                           {expense.receipt && (
-                            <a href={expense.receipt} target="_blank" rel="noopener noreferrer" className="text-xs text-blue-600 hover:underline">
+                            <a href={`/api/files/${expense.id}`} target="_blank" rel="noopener noreferrer" className="text-xs text-blue-600 hover:underline">
                               Ver
                             </a>
                           )}

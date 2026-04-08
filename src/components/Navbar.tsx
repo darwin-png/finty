@@ -4,6 +4,7 @@ import { useSession, signOut } from "next-auth/react";
 import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
+import { useState } from "react";
 import { APP_NAME } from "@/lib/config";
 import InstallBanner from "./InstallBanner";
 
@@ -44,11 +45,53 @@ export default function Navbar() {
   const isAdmin = session?.user?.role === "ADMINISTRADOR";
   const plan = session?.user?.plan;
 
+  const [showPasswordModal, setShowPasswordModal] = useState(false);
+  const [pwForm, setPwForm] = useState({ currentPassword: "", newPassword: "", confirmPassword: "" });
+  const [pwError, setPwError] = useState("");
+  const [pwSuccess, setPwSuccess] = useState("");
+  const [pwLoading, setPwLoading] = useState(false);
+
+  const handleChangePassword = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setPwError("");
+    setPwSuccess("");
+
+    if (pwForm.newPassword !== pwForm.confirmPassword) {
+      setPwError("Las contraseñas no coinciden");
+      return;
+    }
+    if (pwForm.newPassword.length < 6) {
+      setPwError("La nueva contraseña debe tener al menos 6 caracteres");
+      return;
+    }
+
+    setPwLoading(true);
+    try {
+      const res = await fetch("/api/change-password", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ currentPassword: pwForm.currentPassword, newPassword: pwForm.newPassword }),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        setPwError(data.error || "Error al cambiar contraseña");
+      } else {
+        setPwSuccess("Contraseña actualizada correctamente");
+        setPwForm({ currentPassword: "", newPassword: "", confirmPassword: "" });
+        setTimeout(() => setShowPasswordModal(false), 1500);
+      }
+    } catch {
+      setPwError("Error de conexión");
+    }
+    setPwLoading(false);
+  };
+
   const navItems = isAdmin
     ? [
         { href: "/app/admin", label: "Rendiciones", iconKey: "rendiciones" },
         { href: "/app/admin/reports", label: "Reportes", iconKey: "reportes" },
         { href: "/app/admin/users", label: "Usuarios", iconKey: "usuarios" },
+        { href: "/app/dashboard", label: "Mis Gastos", iconKey: "misgastos" },
       ]
     : [
         { href: "/app/dashboard", label: "Mis Gastos", iconKey: "misgastos" },
@@ -66,8 +109,17 @@ export default function Navbar() {
               <span className="text-[10px] bg-yellow-400 text-yellow-900 px-1.5 py-0.5 rounded-full font-bold">FREE</span>
             )}
           </div>
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2">
             <span className="text-xs text-gray-500 hidden sm:block">{session?.user?.name}</span>
+            <button
+              onClick={() => { setPwError(""); setPwSuccess(""); setPwForm({ currentPassword: "", newPassword: "", confirmPassword: "" }); setShowPasswordModal(true); }}
+              className="text-xs text-gray-600 bg-gray-100 hover:bg-gray-200 px-2.5 py-1.5 rounded-lg transition-colors"
+              title="Cambiar contraseña"
+            >
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z" />
+              </svg>
+            </button>
             <button
               onClick={() => signOut({ callbackUrl: "/login" })}
               className="text-xs text-gray-600 bg-gray-100 hover:bg-gray-200 px-3 py-1.5 rounded-lg transition-colors"
@@ -99,6 +151,61 @@ export default function Navbar() {
         </div>
       </nav>
       <InstallBanner />
+
+      {showPasswordModal && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-2xl p-6 w-full max-w-sm">
+            <h3 className="text-lg font-bold text-gray-900 mb-4">Cambiar Contraseña</h3>
+            <form onSubmit={handleChangePassword} className="space-y-3">
+              <div>
+                <label className="block text-xs font-medium text-gray-500 mb-1">Contraseña actual</label>
+                <input
+                  type="password"
+                  value={pwForm.currentPassword}
+                  onChange={(e) => setPwForm({ ...pwForm, currentPassword: e.target.value })}
+                  className="w-full px-3 py-2.5 rounded-xl border border-gray-300 text-sm text-gray-900 outline-none focus:ring-2 focus:ring-[#4A90D9]"
+                  required
+                  autoComplete="current-password"
+                />
+              </div>
+              <div>
+                <label className="block text-xs font-medium text-gray-500 mb-1">Nueva contraseña</label>
+                <input
+                  type="password"
+                  value={pwForm.newPassword}
+                  onChange={(e) => setPwForm({ ...pwForm, newPassword: e.target.value })}
+                  className="w-full px-3 py-2.5 rounded-xl border border-gray-300 text-sm text-gray-900 outline-none focus:ring-2 focus:ring-[#4A90D9]"
+                  required
+                  minLength={6}
+                  autoComplete="new-password"
+                />
+              </div>
+              <div>
+                <label className="block text-xs font-medium text-gray-500 mb-1">Confirmar nueva contraseña</label>
+                <input
+                  type="password"
+                  value={pwForm.confirmPassword}
+                  onChange={(e) => setPwForm({ ...pwForm, confirmPassword: e.target.value })}
+                  className="w-full px-3 py-2.5 rounded-xl border border-gray-300 text-sm text-gray-900 outline-none focus:ring-2 focus:ring-[#4A90D9]"
+                  required
+                  minLength={6}
+                  autoComplete="new-password"
+                />
+              </div>
+              {pwError && <div className="bg-red-50 text-red-600 text-sm p-3 rounded-xl text-center">{pwError}</div>}
+              {pwSuccess && <div className="bg-green-50 text-green-600 text-sm p-3 rounded-xl text-center">{pwSuccess}</div>}
+              <div className="flex gap-3 pt-2">
+                <button type="button" onClick={() => setShowPasswordModal(false)} className="flex-1 py-2.5 rounded-xl border border-gray-300 text-gray-700 text-sm font-medium">
+                  Cancelar
+                </button>
+                <button type="submit" disabled={pwLoading} className="flex-1 py-2.5 rounded-xl bg-[#4A90D9] text-white text-sm font-medium hover:bg-[#3A7BC8] disabled:opacity-50">
+                  {pwLoading ? "Guardando..." : "Cambiar"}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </header>
   );
 }

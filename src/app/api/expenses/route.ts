@@ -5,6 +5,14 @@ import { prisma } from "@/lib/prisma";
 import { getPlanLimits } from "@/lib/plans";
 import { logExpenseAction } from "@/lib/audit";
 
+const ALLOWED_MIME_TYPES = new Set([
+  "image/jpeg",
+  "image/jpg",
+  "image/png",
+  "image/webp",
+  "application/pdf",
+]);
+
 export async function GET(req: NextRequest) {
   const session = await getServerSession(authOptions);
   if (!session) return NextResponse.json({ error: "No autorizado" }, { status: 401 });
@@ -44,6 +52,7 @@ export async function GET(req: NextRequest) {
 
   const expenses = await prisma.expense.findMany({
     where,
+    omit: { receiptData: true },
     include: { user: { select: { name: true, username: true } } },
     orderBy: { createdAt: "desc" },
   });
@@ -70,10 +79,17 @@ export async function POST(req: NextRequest) {
   }
 
   const body = await req.json();
-  const { date, category, description, amount, receipt, tipoDocumento, proveedor, numeroDocumento } = body;
+  const { date, category, description, amount, receipt, receiptBase64, receiptMime, tipoDocumento, proveedor, numeroDocumento } = body;
 
   if (!date || !category || !amount) {
     return NextResponse.json({ error: "Faltan campos obligatorios" }, { status: 400 });
+  }
+
+  if (receiptMime && !ALLOWED_MIME_TYPES.has(receiptMime)) {
+    return NextResponse.json(
+      { error: "Tipo de archivo no permitido" },
+      { status: 400 }
+    );
   }
 
   try {
@@ -84,6 +100,8 @@ export async function POST(req: NextRequest) {
         description: description || null,
         amount: parseFloat(amount),
         receipt: receipt || null,
+        receiptData: receiptBase64 ? Buffer.from(receiptBase64, "base64") : null,
+        receiptMime: receiptMime || null,
         tipoDocumento: tipoDocumento || null,
         proveedor: proveedor || null,
         numeroDocumento: numeroDocumento || null,

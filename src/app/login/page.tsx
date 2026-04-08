@@ -13,6 +13,35 @@ export default function LoginPage() {
   const [loading, setLoading] = useState(false);
   const router = useRouter();
 
+  const [showForgot, setShowForgot] = useState(false);
+  const [forgotForm, setForgotForm] = useState({ username: "", email: "" });
+  const [forgotMsg, setForgotMsg] = useState("");
+  const [forgotError, setForgotError] = useState("");
+  const [forgotLoading, setForgotLoading] = useState(false);
+
+  const handleForgot = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setForgotMsg("");
+    setForgotError("");
+    setForgotLoading(true);
+    try {
+      const res = await fetch("/api/forgot-password", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(forgotForm),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        setForgotError(data.error || "Error al procesar solicitud");
+      } else {
+        setForgotMsg(data.message);
+      }
+    } catch {
+      setForgotError("Error de conexión");
+    }
+    setForgotLoading(false);
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
@@ -82,7 +111,59 @@ export default function LoginPage() {
             {loading ? "Ingresando..." : "Ingresar"}
           </button>
         </form>
+
+        <div className="text-center mt-4">
+          <button
+            onClick={() => { setShowForgot(true); setForgotMsg(""); setForgotError(""); setForgotForm({ username: "", email: "" }); }}
+            className="text-sm text-[#4A90D9] hover:underline"
+          >
+            ¿Olvidaste tu contraseña?
+          </button>
+        </div>
       </div>
+
+      {showForgot && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-2xl p-6 w-full max-w-sm">
+            <h3 className="text-lg font-bold text-gray-900 mb-2">Recuperar Contraseña</h3>
+            <p className="text-sm text-gray-500 mb-4">Ingresa tu usuario y email registrado. Recibirás una contraseña temporal.</p>
+            <form onSubmit={handleForgot} className="space-y-3">
+              <div>
+                <label className="block text-xs font-medium text-gray-500 mb-1">Usuario</label>
+                <input
+                  type="text"
+                  value={forgotForm.username}
+                  onChange={(e) => setForgotForm({ ...forgotForm, username: e.target.value })}
+                  className="w-full px-3 py-2.5 rounded-xl border border-gray-300 text-sm text-gray-900 outline-none focus:ring-2 focus:ring-[#4A90D9]"
+                  required
+                  autoComplete="username"
+                />
+              </div>
+              <div>
+                <label className="block text-xs font-medium text-gray-500 mb-1">Email</label>
+                <input
+                  type="email"
+                  value={forgotForm.email}
+                  onChange={(e) => setForgotForm({ ...forgotForm, email: e.target.value })}
+                  className="w-full px-3 py-2.5 rounded-xl border border-gray-300 text-sm text-gray-900 outline-none focus:ring-2 focus:ring-[#4A90D9]"
+                  required
+                  autoComplete="email"
+                />
+              </div>
+              {forgotError && <div className="bg-red-50 text-red-600 text-sm p-3 rounded-xl text-center">{forgotError}</div>}
+              {forgotMsg && <div className="bg-green-50 text-green-600 text-sm p-3 rounded-xl text-center">{forgotMsg}</div>}
+              <div className="flex gap-3 pt-2">
+                <button type="button" onClick={() => setShowForgot(false)} className="flex-1 py-2.5 rounded-xl border border-gray-300 text-gray-700 text-sm font-medium">
+                  Volver
+                </button>
+                <button type="submit" disabled={forgotLoading} className="flex-1 py-2.5 rounded-xl bg-[#4A90D9] text-white text-sm font-medium hover:bg-[#3A7BC8] disabled:opacity-50">
+                  {forgotLoading ? "Enviando..." : "Enviar"}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

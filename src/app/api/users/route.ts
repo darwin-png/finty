@@ -52,13 +52,17 @@ export async function POST(req: NextRequest) {
 
   const hashedPassword = await bcryptjs.hash(password, 10);
 
+  // Validate role against enum
+  const VALID_ROLES = new Set(["COLABORADOR", "ADMINISTRADOR"]);
+  const resolvedRole = role && VALID_ROLES.has(role) ? role : "COLABORADOR";
+
   const user = await prisma.user.create({
     data: {
       username,
       name,
       email: email || null,
       password: hashedPassword,
-      role: role || "COLABORADOR",
+      role: resolvedRole,
       organizationId: orgId,
     },
     select: { id: true, username: true, name: true, email: true, role: true, active: true },

@@ -1,6 +1,8 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
+import { useSession } from "next-auth/react";
+import { useRouter } from "next/navigation";
 import Navbar from "@/components/Navbar";
 import StatusBadge from "@/components/StatusBadge";
 import Toast from "@/components/Toast";
@@ -32,6 +34,8 @@ interface UserTotal {
 type Tab = "PENDIENTE" | "APROBADO" | "PAGADO";
 
 export default function AdminPanel() {
+  const { data: session, status } = useSession();
+  const router = useRouter();
   const [allExpenses, setAllExpenses] = useState<Expense[]>([]);
   const [loading, setLoading] = useState(true);
   const [tab, setTab] = useState<Tab>("PENDIENTE");
@@ -41,6 +45,13 @@ export default function AdminPanel() {
   const [paying, setPaying] = useState<string | null>(null);
   const [payConfirm, setPayConfirm] = useState<{ open: boolean; userId: string; name: string; total: number; count: number }>({ open: false, userId: "", name: "", total: 0, count: 0 });
   const [toast, setToast] = useState<{ message: string; type: "success" | "error" } | null>(null);
+
+  // Auth guard: redirect non-admins
+  useEffect(() => {
+    if (status === "authenticated" && session?.user?.role !== "ADMINISTRADOR") {
+      router.replace("/app/dashboard");
+    }
+  }, [status, session, router]);
 
   useEffect(() => {
     fetchAll();
@@ -152,6 +163,27 @@ export default function AdminPanel() {
   const totalPagado = pagados.reduce((s, e) => s + e.amount, 0);
   const totalRechazado = rechazados.reduce((s, e) => s + e.amount, 0);
 
+  // Group expenses by user
+  interface GroupedExpenses {
+    userId: string;
+    name: string;
+    items: Expense[];
+  }
+
+  const groupByUser = (expenses: Expense[]): GroupedExpenses[] => {
+    const map = new Map<string, GroupedExpenses>();
+    expenses.forEach((e) => {
+      const key = e.userId || e.user.username;
+      if (!map.has(key)) {
+        map.set(key, { userId: key, name: e.user.name, items: [] });
+      }
+      map.get(key)!.items.push(e);
+    });
+    return Array.from(map.values()).sort((a, b) => a.name.localeCompare(b.name));
+  };
+
+  const currentGrouped = groupByUser(currentList);
+
   // Approved grouped by user (for pay section)
   const approvedByUser: UserTotal[] = (() => {
     const map = new Map<string, UserTotal>();
@@ -173,6 +205,10 @@ export default function AdminPanel() {
     { key: "APROBADO", label: "Aprobados", count: aprobados.length },
     { key: "PAGADO", label: "Pagados", count: pagados.length },
   ];
+
+  // Auth guard: don't render if not admin
+  if (status === "loading" || status === "unauthenticated") return null;
+  if (status === "authenticated" && session?.user?.role !== "ADMINISTRADOR") return null;
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -271,41 +307,52 @@ export default function AdminPanel() {
           </div>
         ) : (
           <>
-            {/* Mobile cards */}
+            {/* Mobile cards grouped by user */}
             <div className="sm:hidden space-y-3">
-              {currentList.map((exp) => (
-                <div key={exp.id} className="bg-white rounded-2xl p-4 shadow-sm border">
-                  <div className="flex items-start justify-between mb-2">
-                    <div>
-                      <div className="text-sm font-semibold text-gray-900">{exp.user.name}</div>
-                      <div className="text-xs text-gray-500">{formatDate(exp.date)} · {categoryLabels[exp.category] || exp.category}</div>
-                      {exp.description && <p className="text-xs text-gray-400 mt-1">{exp.description}</p>}
-                      <div className="text-xs text-gray-400 mt-1">
-                        {exp.tipoDocumento && <span>{exp.tipoDocumento}</span>}
-                        {exp.proveedor && <span> · {exp.proveedor}</span>}
+              {currentGrouped.map((group) => (
+                <div key={group.userId}>
+                  {/* User header card */}
+                  <div className="bg-sky-50 border border-sky-200 rounded-2xl p-3 mb-2">
+                    <div className="text-sm font-semibold text-sky-900">{group.name}</div>
+                    <div className="text-xs text-sky-600">
+                      {group.items.length} rendiciones · {formatCLP(group.items.reduce((s, e) => s + e.amount, 0))}
+                    </div>
+                  </div>
+                  {/* Expense cards */}
+                  {group.items.map((exp) => (
+                    <div key={exp.id} className="bg-white rounded-2xl p-4 shadow-sm border">
+                      <div className="flex items-start justify-between mb-2">
+                        <div>
+                          <div className="text-xs text-gray-500">{formatDate(exp.date)} · {categoryLabels[exp.category] || exp.category}</div>
+                          {exp.description && <p className="text-xs text-gray-400 mt-1">{exp.description}</p>}
+                          <div className="text-xs text-gray-400 mt-1">
+                            {exp.tipoDocumento && <span>{exp.tipoDocumento}</span>}
+                            {exp.proveedor && <span> · {exp.proveedor}</span>}
+                          </div>
+                        </div>
+                        <div className="text-right">
+                          <div className="font-bold text-gray-900">{formatCLP(exp.amount)}</div>
+                          <StatusBadge status={exp.status} />
+                        </div>
+                      </div>
+                      {exp.comment && exp.status === "RECHAZADO" && (
+                        <div className="bg-red-50 text-red-600 text-xs p-2 rounded-lg mb-2">
+                          <span className="font-medium">Motivo: </span>{exp.comment}
+                        </div>
+                      )}
+                      <div className="flex flex-wrap gap-2 pt-2 border-t">
+                        {exp.receipt && (
+                          <a href={`/api/files/${exp.id}`} target="_blank" rel="noopener noreferrer" className="text-xs text-blue-600 hover:underline">Ver comprobante</a>
+                        )}
+                        {exp.status === "PENDIENTE" && (
+                          <>
+                            <button onClick={() => handleApprove(exp.id)} className="text-xs bg-green-600 text-white px-3 py-1 rounded-lg hover:bg-green-700">Aprobar</button>
+                            <button onClick={() => setRejectModal({ id: exp.id, open: true })} className="text-xs bg-red-600 text-white px-3 py-1 rounded-lg hover:bg-red-700">Rechazar</button>
+                          </>
+                        )}
                       </div>
                     </div>
-                    <div className="text-right">
-                      <div className="font-bold text-gray-900">{formatCLP(exp.amount)}</div>
-                      <StatusBadge status={exp.status} />
-                    </div>
-                  </div>
-                  {exp.comment && exp.status === "RECHAZADO" && (
-                    <div className="bg-red-50 text-red-600 text-xs p-2 rounded-lg mb-2">
-                      <span className="font-medium">Motivo: </span>{exp.comment}
-                    </div>
-                  )}
-                  <div className="flex flex-wrap gap-2 pt-2 border-t">
-                    {exp.receipt && (
-                      <a href={exp.receipt} target="_blank" rel="noopener noreferrer" className="text-xs text-blue-600 hover:underline">Ver comprobante</a>
-                    )}
-                    {exp.status === "PENDIENTE" && (
-                      <>
-                        <button onClick={() => handleApprove(exp.id)} className="text-xs bg-green-600 text-white px-3 py-1 rounded-lg hover:bg-green-700">Aprobar</button>
-                        <button onClick={() => setRejectModal({ id: exp.id, open: true })} className="text-xs bg-red-600 text-white px-3 py-1 rounded-lg hover:bg-red-700">Rechazar</button>
-                      </>
-                    )}
-                  </div>
+                  ))}
                 </div>
               ))}
             </div>
@@ -328,19 +375,31 @@ export default function AdminPanel() {
                     </tr>
                   </thead>
                   <tbody className="divide-y">
-                    {currentList.map((exp) => (
-                      <tr key={exp.id} className="hover:bg-gray-50">
-                        <td className="px-4 py-3 text-sm text-gray-900">{exp.user.name}</td>
-                        <td className="px-4 py-3 text-sm text-gray-500">{formatDate(exp.date)}</td>
-                        <td className="px-4 py-3 text-sm text-gray-500">{categoryLabels[exp.category] || exp.category}</td>
-                        <td className="px-4 py-3 text-sm text-gray-500">{exp.proveedor || "—"}</td>
-                        <td className="px-4 py-3 text-sm text-gray-500 max-w-[200px] truncate">{exp.description || "—"}</td>
-                        <td className="px-4 py-3 text-sm text-gray-900 text-right font-medium">{formatCLP(exp.amount)}</td>
-                        <td className="px-4 py-3 text-center">
-                          {exp.receipt ? (
-                            <a href={exp.receipt} target="_blank" rel="noopener noreferrer" className="text-xs text-blue-600 hover:underline">Ver</a>
-                          ) : (
-                            <span className="text-xs text-gray-400">—</span>
+                    {currentGrouped.map((group) => (
+                      <React.Fragment key={group.userId}>
+                        {/* Group header row */}
+                        <tr className="bg-sky-50 hover:bg-sky-100">
+                          <td colSpan={9} className="px-4 py-3">
+                            <div className="text-sm font-semibold text-sky-900">{group.name}</div>
+                            <div className="text-xs text-sky-600">
+                              {group.items.length} rendiciones · {formatCLP(group.items.reduce((s, e) => s + e.amount, 0))}
+                            </div>
+                          </td>
+                        </tr>
+                        {/* Expense rows */}
+                        {group.items.map((exp) => (
+                          <tr key={exp.id} className="hover:bg-gray-50">
+                            <td className="px-4 py-3 text-sm text-gray-500 text-xs">—</td>
+                            <td className="px-4 py-3 text-sm text-gray-500">{formatDate(exp.date)}</td>
+                            <td className="px-4 py-3 text-sm text-gray-500">{categoryLabels[exp.category] || exp.category}</td>
+                            <td className="px-4 py-3 text-sm text-gray-500">{exp.proveedor || "—"}</td>
+                            <td className="px-4 py-3 text-sm text-gray-500 max-w-[200px] truncate">{exp.description || "—"}</td>
+                            <td className="px-4 py-3 text-sm text-gray-900 text-right font-medium">{formatCLP(exp.amount)}</td>
+                            <td className="px-4 py-3 text-center">
+                              {exp.receipt ? (
+                                <a href={`/api/files/${exp.id}`} target="_blank" rel="noopener noreferrer" className="text-xs text-blue-600 hover:underline">Ver</a>
+                              ) : (
+                                <span className="text-xs text-gray-400">—</span>
                           )}
                         </td>
                         <td className="px-4 py-3 text-center"><StatusBadge status={exp.status} /></td>
@@ -356,7 +415,9 @@ export default function AdminPanel() {
                             ) : null}
                           </td>
                         )}
-                      </tr>
+                          </tr>
+                        ))}
+                      </React.Fragment>
                     ))}
                   </tbody>
                 </table>
