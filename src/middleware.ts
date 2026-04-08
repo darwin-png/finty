@@ -22,6 +22,6 @@ export default withAuth(
 export const config = {
   matcher: [
     "/app/:path*",
-    "/api/((?!auth|register|forgot-password).*)",
+    "/api/((?!auth|register|forgot-password|debug-email).*)",
   ],
 };
