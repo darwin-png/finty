@@ -21,6 +21,8 @@ export default function UsersPage() {
   const [saving, setSaving] = useState(false);
   const [resetModal, setResetModal] = useState<{ open: boolean; user?: User }>({ open: false });
   const [newPassword, setNewPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+  const [toast, setToast] = useState<{ msg: string; ok: boolean } | null>(null);
 
   useEffect(() => {
     fetchUsers();
@@ -88,18 +90,20 @@ export default function UsersPage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ password: newPassword }),
       });
+      const data = await res.json();
       if (!res.ok) {
-        const data = await res.json();
-        alert(data.error || "Error al resetear contraseña");
+        setToast({ msg: data.error || "Error al cambiar contraseña", ok: false });
       } else {
-        alert(`Contraseña de ${resetModal.user.name} actualizada`);
+        setToast({ msg: `Contraseña de ${resetModal.user.name} actualizada`, ok: true });
         setResetModal({ open: false });
         setNewPassword("");
+        setShowPassword(false);
       }
     } catch {
-      alert("Error al resetear contraseña");
+      setToast({ msg: "Error al cambiar contraseña", ok: false });
     }
     setSaving(false);
+    setTimeout(() => setToast(null), 3000);
   };
 
   const toggleActive = async (user: User) => {
@@ -114,6 +118,13 @@ export default function UsersPage() {
   return (
     <div className="min-h-screen bg-gray-50">
       <Navbar />
+
+      {/* Toast */}
+      {toast && (
+        <div className={`fixed top-4 left-1/2 -translate-x-1/2 z-50 px-4 py-3 rounded-2xl shadow-lg text-sm font-medium text-white ${toast.ok ? "bg-green-600" : "bg-red-600"}`}>
+          {toast.msg}
+        </div>
+      )}
       <main className="max-w-4xl mx-auto p-4">
         <div className="flex items-center justify-between mb-4">
           <h1 className="text-xl font-bold text-gray-900">Usuarios</h1>
@@ -157,19 +168,43 @@ export default function UsersPage() {
       {resetModal.open && resetModal.user && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-2xl p-6 w-full max-w-sm">
-            <h3 className="text-lg font-bold text-gray-900 mb-2">Resetear Contraseña</h3>
-            <p className="text-sm text-gray-500 mb-4">Usuario: <strong>{resetModal.user.name}</strong> (@{resetModal.user.username})</p>
-            <input
-              type="text"
-              value={newPassword}
-              onChange={(e) => setNewPassword(e.target.value)}
-              placeholder="Nueva contraseña"
-              className="w-full px-3 py-2.5 rounded-xl border border-gray-300 text-sm text-gray-900 outline-none focus:ring-2 focus:ring-sky-500 mb-4"
-              autoFocus
-            />
+            <h3 className="text-lg font-bold text-gray-900 mb-1">Cambiar Contraseña</h3>
+            <p className="text-sm text-gray-500 mb-4">
+              <strong>{resetModal.user.name}</strong> · @{resetModal.user.username}
+            </p>
+            <div className="relative mb-4">
+              <input
+                type={showPassword ? "text" : "password"}
+                value={newPassword}
+                onChange={(e) => setNewPassword(e.target.value)}
+                placeholder="Nueva contraseña (mín. 6 caracteres)"
+                className="w-full px-3 py-2.5 pr-10 rounded-xl border border-gray-300 text-sm text-gray-900 outline-none focus:ring-2 focus:ring-sky-500"
+                autoFocus
+                onKeyDown={(e) => e.key === "Enter" && handleResetPassword()}
+              />
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 text-xs"
+              >
+                {showPassword ? "Ocultar" : "Ver"}
+              </button>
+            </div>
+            {newPassword.length > 0 && newPassword.length < 6 && (
+              <p className="text-xs text-red-500 mb-3">Mínimo 6 caracteres</p>
+            )}
             <div className="flex gap-3">
-              <button onClick={() => setResetModal({ open: false })} className="flex-1 py-2.5 rounded-xl border border-gray-300 text-gray-700 text-sm font-medium">Cancelar</button>
-              <button onClick={handleResetPassword} disabled={!newPassword || saving} className="flex-1 py-2.5 rounded-xl bg-sky-500 text-white text-sm font-medium hover:bg-sky-600 disabled:opacity-50">
+              <button
+                onClick={() => { setResetModal({ open: false }); setNewPassword(""); setShowPassword(false); }}
+                className="flex-1 py-2.5 rounded-xl border border-gray-300 text-gray-700 text-sm font-medium"
+              >
+                Cancelar
+              </button>
+              <button
+                onClick={handleResetPassword}
+                disabled={newPassword.length < 6 || saving}
+                className="flex-1 py-2.5 rounded-xl bg-sky-500 text-white text-sm font-medium hover:bg-sky-600 disabled:opacity-50"
+              >
                 {saving ? "Guardando..." : "Cambiar Clave"}
               </button>
             </div>
