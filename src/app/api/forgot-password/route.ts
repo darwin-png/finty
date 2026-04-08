@@ -35,11 +35,15 @@ export async function POST(req: NextRequest) {
   });
 
   // Send email via Resend
-  if (process.env.RESEND_API_KEY) {
-    const resend = new Resend(process.env.RESEND_API_KEY);
+  const apiKey = process.env.RESEND_API_KEY;
+  console.log("[forgot-password] RESEND_API_KEY present:", !!apiKey, "| length:", apiKey?.length);
+  console.log("[forgot-password] Sending to:", user.email);
+
+  if (apiKey) {
+    const resend = new Resend(apiKey);
 
     try {
-      await resend.emails.send({
+      const result = await resend.emails.send({
         from: "noreply@finty.cl",
         to: user.email,
         subject: "Finty - Recuperación de contraseña",
@@ -58,9 +62,12 @@ export async function POST(req: NextRequest) {
           </div>
         `,
       });
+      console.log("[forgot-password] Resend result:", JSON.stringify(result));
     } catch (error) {
-      console.error("Error sending password reset email:", error);
+      console.error("[forgot-password] Resend exception:", error);
     }
+  } else {
+    console.error("[forgot-password] RESEND_API_KEY is missing!");
   }
 
   return successResponse;
