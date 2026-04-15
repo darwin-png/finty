@@ -6,7 +6,14 @@ import { Resend } from "resend";
 import PDFDocument from "pdfkit";
 import { categoryLabels } from "@/lib/categories";
 
-const resend = new Resend(process.env.RESEND_API_KEY);
+// Initialize Resend lazily to avoid build-time issues
+let resend: Resend | null = null;
+function getResend() {
+  if (!resend && process.env.RESEND_API_KEY) {
+    resend = new Resend(process.env.RESEND_API_KEY);
+  }
+  return resend;
+}
 
 function formatCLP(amount: number) {
   return `$${amount.toLocaleString("es-CL")}`;
@@ -140,7 +147,12 @@ export async function POST(req: NextRequest) {
   try {
     const pdfBuffer = await generatePaymentPDF(orgName, user, expenses, total, ref, paidAt);
 
-    await resend.emails.send({
+    const emailClient = getResend();
+    if (!emailClient) {
+      return NextResponse.json({ error: "Email service not configured" }, { status: 500 });
+    }
+
+    await emailClient.emails.send({
       from: "noreply@finty.cl",
       to: user.email,
       subject: `Comprobante de Pago - ${ref}`,
