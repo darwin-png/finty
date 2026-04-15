@@ -57,7 +57,13 @@ export async function GET(req: NextRequest) {
     orderBy: { createdAt: "desc" },
   });
 
-  return NextResponse.json(expenses);
+  // Add hasReceipt flag to each expense for client-side display
+  const expensesWithFlags = expenses.map((exp: any) => ({
+    ...exp,
+    hasReceipt: exp.receiptMime !== null,
+  }));
+
+  return NextResponse.json(expensesWithFlags);
 }
 
 export async function POST(req: NextRequest) {

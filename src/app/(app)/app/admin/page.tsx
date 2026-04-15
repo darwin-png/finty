@@ -15,6 +15,8 @@ interface Expense {
   description: string | null;
   amount: number;
   receipt: string | null;
+  receiptMime: string | null;
+  hasReceipt?: boolean;
   status: string;
   comment: string | null;
   tipoDocumento: string | null;
@@ -45,6 +47,8 @@ export default function AdminPanel() {
   const [paying, setPaying] = useState<string | null>(null);
   const [payConfirm, setPayConfirm] = useState<{ open: boolean; userId: string; name: string; total: number; count: number }>({ open: false, userId: "", name: "", total: 0, count: 0 });
   const [toast, setToast] = useState<{ message: string; type: "success" | "error" } | null>(null);
+  const [deleteModal, setDeleteModal] = useState<{ id: string; open: boolean }>({ id: "", open: false });
+  const [markingPaid, setMarkingPaid] = useState<string | null>(null);
 
   // Auth guard: redirect non-admins
   useEffect(() => {
@@ -142,6 +146,35 @@ export default function AdminPanel() {
       showToast("Error al procesar pago", "error");
     } finally {
       setPaying(null);
+    }
+  };
+
+  const handleDelete = async () => {
+    const res = await fetch(`/api/expenses/${deleteModal.id}`, { method: "DELETE" });
+    setDeleteModal({ id: "", open: false });
+    if (res.ok) {
+      showToast("Gasto eliminado");
+      fetchAll();
+    } else {
+      const err = await res.json();
+      showToast(err.error || "Error al eliminar", "error");
+    }
+  };
+
+  const handleMarkPaid = async (id: string) => {
+    setMarkingPaid(id);
+    const res = await fetch(`/api/expenses/${id}`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ status: "PAGADO" }),
+    });
+    setMarkingPaid(null);
+    if (res.ok) {
+      showToast("Gasto marcado como pagado");
+      fetchAll();
+    } else {
+      const err = await res.json();
+      showToast(err.error || "Error al marcar como pagado", "error");
     }
   };
 
@@ -341,7 +374,7 @@ export default function AdminPanel() {
                         </div>
                       )}
                       <div className="flex flex-wrap gap-2 pt-2 border-t">
-                        {exp.receipt && (
+                        {exp.hasReceipt && (
                           <a href={`/api/files/${exp.id}`} target="_blank" rel="noopener noreferrer" className="text-xs text-blue-600 hover:underline">Ver comprobante</a>
                         )}
                         {exp.status === "PENDIENTE" && (
@@ -350,6 +383,21 @@ export default function AdminPanel() {
                             <button onClick={() => setRejectModal({ id: exp.id, open: true })} className="text-xs bg-red-600 text-white px-3 py-1 rounded-lg hover:bg-red-700">Rechazar</button>
                           </>
                         )}
+                        {exp.status === "APROBADO" && (
+                          <button
+                            onClick={() => handleMarkPaid(exp.id)}
+                            disabled={markingPaid === exp.id}
+                            className="text-xs bg-sky-600 text-white px-3 py-1 rounded-lg hover:bg-sky-700 disabled:opacity-50 disabled:cursor-wait"
+                          >
+                            {markingPaid === exp.id ? "Marcando..." : "Marcar pagada"}
+                          </button>
+                        )}
+                        <button
+                          onClick={() => setDeleteModal({ id: exp.id, open: true })}
+                          className="text-xs bg-red-600 text-white px-3 py-1 rounded-lg hover:bg-red-700"
+                        >
+                          Eliminar
+                        </button>
                       </div>
                     </div>
                   ))}
@@ -371,7 +419,7 @@ export default function AdminPanel() {
                       <th className="px-4 py-3 text-right text-xs font-medium text-gray-500">Monto</th>
                       <th className="px-4 py-3 text-center text-xs font-medium text-gray-500">Comp.</th>
                       <th className="px-4 py-3 text-center text-xs font-medium text-gray-500">Estado</th>
-                      {tab === "PENDIENTE" && <th className="px-4 py-3 text-center text-xs font-medium text-gray-500">Acciones</th>}
+                      <th className="px-4 py-3 text-center text-xs font-medium text-gray-500">Acciones</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y">
@@ -396,25 +444,33 @@ export default function AdminPanel() {
                             <td className="px-4 py-3 text-sm text-gray-500 max-w-[200px] truncate">{exp.description || "—"}</td>
                             <td className="px-4 py-3 text-sm text-gray-900 text-right font-medium">{formatCLP(exp.amount)}</td>
                             <td className="px-4 py-3 text-center">
-                              {exp.receipt ? (
+                              {exp.hasReceipt ? (
                                 <a href={`/api/files/${exp.id}`} target="_blank" rel="noopener noreferrer" className="text-xs text-blue-600 hover:underline">Ver</a>
                               ) : (
                                 <span className="text-xs text-gray-400">—</span>
                           )}
                         </td>
                         <td className="px-4 py-3 text-center"><StatusBadge status={exp.status} /></td>
-                        {tab === "PENDIENTE" && (
-                          <td className="px-4 py-3 text-center">
-                            {exp.status === "PENDIENTE" ? (
-                              <div className="flex gap-1 justify-center">
+                        <td className="px-4 py-3 text-center">
+                          <div className="flex gap-1 justify-center flex-wrap">
+                            {exp.status === "PENDIENTE" && (
+                              <>
                                 <button onClick={() => handleApprove(exp.id)} className="text-xs bg-green-600 text-white px-2 py-1 rounded-lg hover:bg-green-700">Aprobar</button>
                                 <button onClick={() => setRejectModal({ id: exp.id, open: true })} className="text-xs bg-red-600 text-white px-2 py-1 rounded-lg hover:bg-red-700">Rechazar</button>
-                              </div>
-                            ) : exp.comment ? (
-                              <span className="text-xs text-gray-400" title={exp.comment}>Ver motivo</span>
-                            ) : null}
-                          </td>
-                        )}
+                              </>
+                            )}
+                            {exp.status === "APROBADO" && (
+                              <button onClick={() => handleMarkPaid(exp.id)} disabled={markingPaid === exp.id}
+                                      className="text-xs bg-sky-600 text-white px-2 py-1 rounded-lg hover:bg-sky-700 disabled:opacity-50 disabled:cursor-wait">
+                                {markingPaid === exp.id ? "Marcando..." : "Marcar pagada"}
+                              </button>
+                            )}
+                            <button onClick={() => setDeleteModal({ id: exp.id, open: true })}
+                                    className="text-xs bg-red-600 text-white px-2 py-1 rounded-lg hover:bg-red-700">
+                              Eliminar
+                            </button>
+                          </div>
+                        </td>
                           </tr>
                         ))}
                       </React.Fragment>
@@ -462,6 +518,28 @@ export default function AdminPanel() {
             <div className="flex gap-3">
               <button onClick={() => setPayConfirm({ open: false, userId: "", name: "", total: 0, count: 0 })} className="flex-1 py-2.5 rounded-xl border border-gray-300 text-gray-700 text-sm font-medium">Cancelar</button>
               <button onClick={() => { setPayConfirm({ open: false, userId: "", name: "", total: 0, count: 0 }); handlePay(payConfirm.userId); }} className="flex-1 py-2.5 rounded-xl bg-green-600 text-white text-sm font-medium hover:bg-green-700">Confirmar Pago</button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Delete Confirm Modal */}
+      {deleteModal.open && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-2xl p-6 w-full max-w-sm">
+            <h3 className="text-lg font-bold text-gray-900 mb-2">Eliminar Rendición</h3>
+            <p className="text-sm text-gray-600 mb-6">
+              ¿Estás seguro de que deseas eliminar esta rendición? Esta acción no se puede deshacer.
+            </p>
+            <div className="flex gap-3">
+              <button onClick={() => setDeleteModal({ id: "", open: false })}
+                      className="flex-1 py-2.5 rounded-xl border border-gray-300 text-gray-700 text-sm font-medium">
+                Cancelar
+              </button>
+              <button onClick={handleDelete}
+                      className="flex-1 py-2.5 rounded-xl bg-red-600 text-white text-sm font-medium hover:bg-red-700">
+                Eliminar
+              </button>
             </div>
           </div>
         </div>

@@ -34,6 +34,9 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
       if (expense.status === "APROBADO" && status === "PENDIENTE") {
         return NextResponse.json({ error: "No se puede devolver a pendiente un gasto aprobado" }, { status: 400 });
       }
+      if (status === "PAGADO" && expense.status !== "APROBADO") {
+        return NextResponse.json({ error: "Solo se pueden marcar como pagados los gastos aprobados" }, { status: 400 });
+      }
     }
 
     const data: Record<string, unknown> = {};
@@ -42,12 +45,17 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
     if (status === "APROBADO" || status === "RECHAZADO") {
       data.approvedById = session.user.id;
     }
+    if (status === "PAGADO") {
+      data.paidAt = new Date();
+      data.paymentRef = `PAG-MANUAL-${Date.now()}`;
+    }
 
     const updated = await prisma.expense.update({ where: { id }, data });
 
     // Audit log
     if (status === "APROBADO") logExpenseAction(id, "APPROVED", session.user.id);
     if (status === "RECHAZADO") logExpenseAction(id, "REJECTED", session.user.id);
+    if (status === "PAGADO") logExpenseAction(id, "PAID", session.user.id);
 
     // Send email notification on approve/reject (fire-and-forget)
     if (status === "APROBADO" || status === "RECHAZADO") {
