@@ -387,9 +387,9 @@ export default function AdminPanel() {
                           <button
                             onClick={() => handleMarkPaid(exp.id)}
                             disabled={markingPaid === exp.id}
-                            className="text-xs bg-sky-600 text-white px-3 py-1 rounded-lg hover:bg-sky-700 disabled:opacity-50 disabled:cursor-wait"
+                            className="text-xs bg-green-600 text-white px-3 py-1 rounded-lg hover:bg-green-700 disabled:opacity-50 disabled:cursor-wait font-medium"
                           >
-                            {markingPaid === exp.id ? "Marcando..." : "Marcar pagada"}
+                            {markingPaid === exp.id ? "Pagando..." : "✓ Pagada"}
                           </button>
                         )}
                         <button
@@ -461,8 +461,8 @@ export default function AdminPanel() {
                             )}
                             {exp.status === "APROBADO" && (
                               <button onClick={() => handleMarkPaid(exp.id)} disabled={markingPaid === exp.id}
-                                      className="text-xs bg-sky-600 text-white px-2 py-1 rounded-lg hover:bg-sky-700 disabled:opacity-50 disabled:cursor-wait">
-                                {markingPaid === exp.id ? "Marcando..." : "Marcar pagada"}
+                                      className="text-xs bg-green-600 text-white px-2 py-1 rounded-lg hover:bg-green-700 disabled:opacity-50 disabled:cursor-wait font-medium">
+                                {markingPaid === exp.id ? "Pagando..." : "✓ Pagada"}
                               </button>
                             )}
                             <button onClick={() => setDeleteModal({ id: exp.id, open: true })}
