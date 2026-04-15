@@ -104,14 +104,19 @@ export async function DELETE(req: NextRequest, { params }: { params: Promise<{ i
     return NextResponse.json({ error: "Gasto no encontrado" }, { status: 404 });
   }
 
-  if (session.user.role !== "ADMINISTRADOR" && expense.userId !== session.user.id) {
+  // Only admin or the expense owner can delete
+  const isAdmin = session.user.role === "ADMINISTRADOR";
+  const isOwner = expense.userId === session.user.id;
+  if (!isAdmin && !isOwner) {
     return NextResponse.json({ error: "No autorizado" }, { status: 403 });
   }
 
-  if (expense.status !== "PENDIENTE" && session.user.role !== "ADMINISTRADOR") {
+  // Non-admins can only delete PENDIENTE expenses
+  if (!isAdmin && expense.status !== "PENDIENTE") {
     return NextResponse.json({ error: "Solo se pueden eliminar gastos pendientes" }, { status: 400 });
   }
 
+  // Admin can delete any status - proceed with deletion
   await prisma.expense.delete({ where: { id } });
   return NextResponse.json({ success: true });
 }
