@@ -49,6 +49,9 @@ export default function AdminPanel() {
   const [toast, setToast] = useState<{ message: string; type: "success" | "error" } | null>(null);
   const [deleteModal, setDeleteModal] = useState<{ id: string; open: boolean }>({ id: "", open: false });
   const [markingPaid, setMarkingPaid] = useState<string | null>(null);
+  const [expandedRejectModal, setExpandedRejectModal] = useState(false);
+  const [expandedPayConfirm, setExpandedPayConfirm] = useState(false);
+  const [expandedDeleteModal, setExpandedDeleteModal] = useState(false);
 
   // Auth guard: redirect non-admins
   useEffect(() => {
@@ -482,16 +485,33 @@ export default function AdminPanel() {
       {/* Reject Modal */}
       {rejectModal.open && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-2xl p-6 w-full max-w-sm">
-            <h3 className="text-lg font-bold text-slate-900 mb-4">Rechazar Gasto</h3>
+          <div className={`bg-white rounded-2xl p-6 w-full transition-all ${expandedRejectModal ? 'max-w-2xl' : 'max-w-sm'}`}>
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-lg font-bold text-slate-900">Rechazar Gasto</h3>
+              <button
+                onClick={() => setExpandedRejectModal(!expandedRejectModal)}
+                className="p-1.5 hover:bg-slate-100 rounded-lg transition-colors"
+                title={expandedRejectModal ? "Comprimir" : "Expandir"}
+              >
+                {expandedRejectModal ? (
+                  <svg className="w-5 h-5 text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                ) : (
+                  <svg className="w-5 h-5 text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 20v-4m0 4h4m-4 0l5-5m11 5v-4m0 4h-4m4 0l-5-5" />
+                  </svg>
+                )}
+              </button>
+            </div>
             <textarea
               value={rejectComment}
               onChange={(e) => setRejectComment(e.target.value)}
               placeholder="Motivo del rechazo..."
-              className="w-full px-3 py-2 rounded-xl border border-gray-300 focus:ring-2 focus:ring-sky-500 outline-none text-gray-900 h-24 resize-none"
+              className={`w-full px-3 py-2 rounded-xl border border-gray-300 focus:ring-2 focus:ring-sky-500 outline-none text-gray-900 resize-none transition-all ${expandedRejectModal ? 'h-48' : 'h-24'}`}
             />
             <div className="flex gap-3 mt-4">
-              <button onClick={() => { setRejectModal({ id: "", open: false }); setRejectComment(""); }} className="flex-1 py-2.5 rounded-lg border border-slate-300 text-slate-700 text-sm font-medium hover:bg-slate-50">Cancelar</button>
+              <button onClick={() => { setRejectModal({ id: "", open: false }); setRejectComment(""); setExpandedRejectModal(false); }} className="flex-1 py-2.5 rounded-lg border border-slate-300 text-slate-700 text-sm font-medium hover:bg-slate-50">Cancelar</button>
               <button onClick={handleReject} className="flex-1 py-2.5 rounded-xl bg-red-600 text-white text-sm font-medium hover:bg-red-700">Rechazar</button>
             </div>
           </div>
@@ -501,8 +521,25 @@ export default function AdminPanel() {
       {/* Pay Confirm Modal */}
       {payConfirm.open && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-2xl p-6 w-full max-w-sm">
-            <h3 className="text-lg font-bold text-gray-900 mb-2">Confirmar Pago</h3>
+          <div className={`bg-white rounded-2xl p-6 w-full transition-all ${expandedPayConfirm ? 'max-w-2xl' : 'max-w-sm'}`}>
+            <div className="flex items-center justify-between mb-2">
+              <h3 className="text-lg font-bold text-gray-900">Confirmar Pago</h3>
+              <button
+                onClick={() => setExpandedPayConfirm(!expandedPayConfirm)}
+                className="p-1.5 hover:bg-slate-100 rounded-lg transition-colors"
+                title={expandedPayConfirm ? "Comprimir" : "Expandir"}
+              >
+                {expandedPayConfirm ? (
+                  <svg className="w-5 h-5 text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                ) : (
+                  <svg className="w-5 h-5 text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 20v-4m0 4h4m-4 0l5-5m11 5v-4m0 4h-4m4 0l-5-5" />
+                  </svg>
+                )}
+              </button>
+            </div>
             <p className="text-sm text-slate-600 mb-4">
               ¿Procesar el pago para <strong>{payConfirm.name}</strong>?
             </p>
@@ -512,7 +549,7 @@ export default function AdminPanel() {
             </div>
             <p className="text-xs text-gray-400 mb-4">Se generará un comprobante PDF y se enviará por email.</p>
             <div className="flex gap-3">
-              <button onClick={() => setPayConfirm({ open: false, userId: "", name: "", total: 0, count: 0 })} className="flex-1 py-2.5 rounded-lg border border-slate-300 text-slate-700 text-sm font-medium hover:bg-slate-50">Cancelar</button>
+              <button onClick={() => { setPayConfirm({ open: false, userId: "", name: "", total: 0, count: 0 }); setExpandedPayConfirm(false); }} className="flex-1 py-2.5 rounded-lg border border-slate-300 text-slate-700 text-sm font-medium hover:bg-slate-50">Cancelar</button>
               <button onClick={() => { setPayConfirm({ open: false, userId: "", name: "", total: 0, count: 0 }); handlePay(payConfirm.userId); }} className="flex-1 py-2.5 rounded-xl bg-green-600 text-white text-sm font-medium hover:bg-green-700">Confirmar Pago</button>
             </div>
           </div>
@@ -522,13 +559,30 @@ export default function AdminPanel() {
       {/* Delete Confirm Modal */}
       {deleteModal.open && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-2xl p-6 w-full max-w-sm">
-            <h3 className="text-lg font-bold text-gray-900 mb-2">Eliminar Rendición</h3>
+          <div className={`bg-white rounded-2xl p-6 w-full transition-all ${expandedDeleteModal ? 'max-w-2xl' : 'max-w-sm'}`}>
+            <div className="flex items-center justify-between mb-2">
+              <h3 className="text-lg font-bold text-gray-900">Eliminar Rendición</h3>
+              <button
+                onClick={() => setExpandedDeleteModal(!expandedDeleteModal)}
+                className="p-1.5 hover:bg-slate-100 rounded-lg transition-colors"
+                title={expandedDeleteModal ? "Comprimir" : "Expandir"}
+              >
+                {expandedDeleteModal ? (
+                  <svg className="w-5 h-5 text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                ) : (
+                  <svg className="w-5 h-5 text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 20v-4m0 4h4m-4 0l5-5m11 5v-4m0 4h-4m4 0l-5-5" />
+                  </svg>
+                )}
+              </button>
+            </div>
             <p className="text-sm text-gray-600 mb-6">
               ¿Estás seguro de que deseas eliminar esta rendición? Esta acción no se puede deshacer.
             </p>
             <div className="flex gap-3">
-              <button onClick={() => setDeleteModal({ id: "", open: false })}
+              <button onClick={() => { setDeleteModal({ id: "", open: false }); setExpandedDeleteModal(false); }}
                       className="flex-1 py-2.5 rounded-lg border border-slate-300 text-slate-700 text-sm font-medium hover:bg-slate-50">
                 Cancelar
               </button>
