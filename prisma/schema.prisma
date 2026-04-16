@@ -51,7 +51,7 @@ model Organization {
 
 model User {
   id             String       @id @default(uuid())
-  username       String       @unique
+  username       String
   password       String
   name           String
   email          String?
@@ -63,6 +63,7 @@ model User {
   updatedAt      DateTime     @updatedAt
   expenses       Expense[]
 
+  @@unique([organizationId, username])
   @@index([organizationId])
   @@schema("finty")
 }

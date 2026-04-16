@@ -15,13 +15,16 @@ export async function POST(req: NextRequest) {
     message: "Si los datos coinciden, recibirás un correo con tu nueva contraseña temporal.",
   });
 
-  const user = await prisma.user.findUnique({
-    where: { username },
+  // Find user by email first (more secure than username which is now per-org)
+  // Then verify username matches for additional security
+  const user = await prisma.user.findFirst({
+    where: { email },
     include: { organization: true },
   });
 
   if (!user || !user.active || !user.email) return successResponse;
   if (user.email.toLowerCase() !== email.toLowerCase()) return successResponse;
+  if (user.username !== username) return successResponse;  // Verify username matches
   if (!user.organization || !user.organization.active) return successResponse;
 
   // Generate temporary password

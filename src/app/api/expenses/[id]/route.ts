@@ -14,8 +14,15 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
   const isAdmin = session.user.role === "ADMINISTRADOR";
   const orgId = session.user.organizationId;
 
-  const expense = await prisma.expense.findUnique({ where: { id } });
-  if (!expense || expense.organizationId !== orgId) {
+  if (!orgId) {
+    return NextResponse.json({ error: "No autorizado" }, { status: 403 });
+  }
+
+  // Buscar gasto en la organización actual (prevenir IDOR)
+  const expense = await prisma.expense.findFirst({
+    where: { id, organizationId: orgId }
+  });
+  if (!expense) {
     return NextResponse.json({ error: "Gasto no encontrado" }, { status: 404 });
   }
 
@@ -99,8 +106,15 @@ export async function DELETE(req: NextRequest, { params }: { params: Promise<{ i
   const { id } = await params;
   const orgId = session.user.organizationId;
 
-  const expense = await prisma.expense.findUnique({ where: { id } });
-  if (!expense || expense.organizationId !== orgId) {
+  if (!orgId) {
+    return NextResponse.json({ error: "No autorizado" }, { status: 403 });
+  }
+
+  // Buscar gasto en la organización actual (prevenir IDOR)
+  const expense = await prisma.expense.findFirst({
+    where: { id, organizationId: orgId }
+  });
+  if (!expense) {
     return NextResponse.json({ error: "Gasto no encontrado" }, { status: 404 });
   }
 

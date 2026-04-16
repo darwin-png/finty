@@ -13,9 +13,15 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
   const { id } = await params;
   const orgId = session.user.organizationId;
 
-  // Verify user belongs to same org
-  const existingUser = await prisma.user.findUnique({ where: { id } });
-  if (!existingUser || existingUser.organizationId !== orgId) {
+  if (!orgId) {
+    return NextResponse.json({ error: "No autorizado" }, { status: 403 });
+  }
+
+  // Verify user belongs to same org (prevenir IDOR)
+  const existingUser = await prisma.user.findFirst({
+    where: { id, organizationId: orgId }
+  });
+  if (!existingUser) {
     return NextResponse.json({ error: "Usuario no encontrado" }, { status: 404 });
   }
 
@@ -25,9 +31,12 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
   const data: Record<string, unknown> = {};
   if (name !== undefined) data.name = name;
   if (username !== undefined && username !== existingUser.username) {
-    const taken = await prisma.user.findUnique({ where: { username } });
+    // Check username unique within organization
+    const taken = await prisma.user.findFirst({
+      where: { username, organizationId: orgId }
+    });
     if (taken) {
-      return NextResponse.json({ error: "Ese nombre de usuario ya está en uso" }, { status: 400 });
+      return NextResponse.json({ error: "Ese nombre de usuario ya está en uso en esta organización" }, { status: 400 });
     }
     data.username = username;
   }

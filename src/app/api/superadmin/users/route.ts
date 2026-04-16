@@ -53,10 +53,12 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Organización no encontrada" }, { status: 404 });
   }
 
-  // Check username unique
-  const existing = await prisma.user.findUnique({ where: { username: username.trim() } });
+  // Check username unique within organization
+  const existing = await prisma.user.findFirst({
+    where: { username: username.trim(), organizationId }
+  });
   if (existing) {
-    return NextResponse.json({ error: "Ese nombre de usuario ya existe" }, { status: 400 });
+    return NextResponse.json({ error: "Ese nombre de usuario ya existe en esta organización" }, { status: 400 });
   }
 
   if (password.length < 6) {

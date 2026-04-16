@@ -21,9 +21,10 @@ async function main() {
   });
 
   // Create admin user linked to org
+  // Note: username is now unique per organization, so we use compound unique key
   await prisma.user.upsert({
-    where: { username: "admin" },
-    update: { organizationId: org.id },
+    where: { organizationId_username: { organizationId: org.id, username: "admin" } },
+    update: {},
     create: {
       username: "admin",
       password,

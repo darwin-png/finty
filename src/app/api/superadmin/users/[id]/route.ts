@@ -13,14 +13,18 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
   const { id } = await params;
   const { name, username, password, email, role, active } = await req.json();
 
-  const user = await prisma.user.findUnique({ where: { id } });
+  // Even SuperAdmin should validate user exists via proper query (defense in depth)
+  const user = await prisma.user.findFirst({ where: { id } });
   if (!user) return NextResponse.json({ error: "Usuario no encontrado" }, { status: 404 });
 
   const data: Record<string, unknown> = {};
   if (name !== undefined) data.name = name.trim();
   if (username !== undefined && username !== user.username) {
-    const taken = await prisma.user.findUnique({ where: { username } });
-    if (taken) return NextResponse.json({ error: "Username en uso" }, { status: 400 });
+    // Check username unique within organization
+    const taken = await prisma.user.findFirst({
+      where: { username, organizationId: user.organizationId }
+    });
+    if (taken) return NextResponse.json({ error: "Username en uso en esta organización" }, { status: 400 });
     data.username = username;
   }
   if (email !== undefined) data.email = email || null;
@@ -58,7 +62,8 @@ export async function DELETE(_req: NextRequest, { params }: { params: Promise<{ 
 
   const { id } = await params;
 
-  const user = await prisma.user.findUnique({ where: { id } });
+  // Validate user exists via proper query (defense in depth)
+  const user = await prisma.user.findFirst({ where: { id } });
   if (!user) return NextResponse.json({ error: "Usuario no encontrado" }, { status: 404 });
 
   // Don't allow deleting if they're the last admin of an org

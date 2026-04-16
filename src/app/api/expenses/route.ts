@@ -33,6 +33,13 @@ export async function GET(req: NextRequest) {
 
   const userId = searchParams.get("userId");
   if (isAdmin && userId) {
+    // Validate that userId belongs to the same organization (prevent cross-org data access)
+    const userExists = await prisma.user.findFirst({
+      where: { id: userId, organizationId: orgId }
+    });
+    if (!userExists) {
+      return NextResponse.json({ error: "Usuario no encontrado" }, { status: 404 });
+    }
     where.userId = userId;
   }
 

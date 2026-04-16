@@ -53,9 +53,12 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Faltan campos obligatorios" }, { status: 400 });
   }
 
-  const existing = await prisma.user.findUnique({ where: { username } });
+  // Check username unique within organization
+  const existing = await prisma.user.findFirst({
+    where: { username, organizationId: orgId }
+  });
   if (existing) {
-    return NextResponse.json({ error: "El usuario ya existe" }, { status: 400 });
+    return NextResponse.json({ error: "El usuario ya existe en esta organización" }, { status: 400 });
   }
 
   const hashedPassword = await bcryptjs.hash(password, 10);

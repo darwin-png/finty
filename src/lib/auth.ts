@@ -8,14 +8,21 @@ export const authOptions: AuthOptions = {
     CredentialsProvider({
       name: "Credentials",
       credentials: {
-        username: { label: "Usuario", type: "text" },
+        username: { label: "Usuario o Email", type: "text" },
         password: { label: "Contraseña", type: "password" },
       },
       async authorize(credentials) {
         if (!credentials?.username || !credentials?.password) return null;
 
-        const user = await prisma.user.findUnique({
-          where: { username: credentials.username },
+        // Find user by email (global unique) or username
+        // Email is preferred since it's globally unique
+        const user = await prisma.user.findFirst({
+          where: {
+            OR: [
+              { email: credentials.username },
+              { username: credentials.username }
+            ]
+          },
           include: { organization: true },
         });
 

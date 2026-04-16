@@ -33,6 +33,6 @@ export default withAuth(
 export const config = {
   matcher: [
     "/app/:path*",
-    "/api/((?!auth|register|forgot-password|debug-email).*)",
+    "/api/((?!auth|forgot-password|debug-email).*)",  // Removed 'register' - now requires auth
   ],
 };

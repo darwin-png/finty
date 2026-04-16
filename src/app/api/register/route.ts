@@ -1,4 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import bcryptjs from "bcryptjs";
 import crypto from "crypto";
@@ -30,6 +32,13 @@ async function generateUniqueSlug(baseName: string): Promise<string> {
 }
 
 export async function POST(req: NextRequest) {
+  // Registration is now restricted to SUPERADMIN creating new organizations
+  // Public registration is disabled for SaaS security
+  const session = await getServerSession(authOptions);
+  if (!session || session.user.role !== "SUPERADMIN") {
+    return NextResponse.json({ error: "El registro de organizaciones es privado. Contacte al administrador." }, { status: 403 });
+  }
+
   const body = await req.json();
   const { orgName, name, username, password } = body;
 
@@ -41,11 +50,8 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "La contraseña debe tener al menos 6 caracteres" }, { status: 400 });
   }
 
-  // Check username availability before transaction
-  const existingUser = await prisma.user.findUnique({ where: { username } });
-  if (existingUser) {
-    return NextResponse.json({ error: "El usuario ya existe" }, { status: 400 });
-  }
+  // Note: Username uniqueness is now per-organization, so we don't need to check globally
+  // The constraint will be validated when creating the user within the organization
 
   const slug = await generateUniqueSlug(orgName);
   const hashedPassword = await bcryptjs.hash(password, 10);
