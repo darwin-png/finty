@@ -6,13 +6,16 @@ export default withAuth(
     const { pathname } = req.nextUrl;
     const token = req.nextauth.token;
 
-    // SuperAdmin: solo puede acceder a /app/superadmin
-    if (token?.role === "SUPERADMIN" && !pathname.startsWith("/app/superadmin")) {
+    // SuperAdmin: solo puede acceder a /app/superadmin y /api/superadmin
+    if (token?.role === "SUPERADMIN" && !pathname.startsWith("/app/superadmin") && !pathname.startsWith("/api/superadmin") && !pathname.startsWith("/api/auth")) {
       return NextResponse.redirect(new URL("/app/superadmin", req.url));
     }
 
-    // Proteger rutas superadmin — solo SUPERADMIN
-    if (pathname.startsWith("/app/superadmin") && token?.role !== "SUPERADMIN") {
+    // Proteger rutas superadmin — solo SUPERADMIN (UI + API)
+    if ((pathname.startsWith("/app/superadmin") || pathname.startsWith("/api/superadmin")) && token?.role !== "SUPERADMIN") {
+      if (pathname.startsWith("/api/")) {
+        return NextResponse.json({ error: "No autorizado" }, { status: 403 });
+      }
       return NextResponse.redirect(new URL("/app/dashboard", req.url));
     }
 
