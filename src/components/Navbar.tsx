@@ -4,40 +4,8 @@ import { useSession, signOut } from "next-auth/react";
 import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import { APP_NAME } from "@/lib/config";
-import InstallBanner from "./InstallBanner";
-
-const IconRendiciones = () => (
-  <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
-    <path strokeLinecap="round" strokeLinejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-  </svg>
-);
-
-const IconReportes = () => (
-  <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
-    <path strokeLinecap="round" strokeLinejoin="round" d="M3 13h2v8H3zm6-4h2v12H9zm6-3h2v15h-2zm6-4h2v19h-2z" />
-  </svg>
-);
-
-const IconUsuarios = () => (
-  <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
-    <path strokeLinecap="round" strokeLinejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
-  </svg>
-);
-
-const IconMisGastos = () => (
-  <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
-    <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 18.75a60.07 60.07 0 0115.797 2.101c.727.198 1.453-.342 1.453-1.096V18.75M3.75 4.5v.75A.75.75 0 013 6h-.75m0 0v-.375c0-.621.504-1.125 1.125-1.125H20.25M2.25 6v9m18-10.5v.75c0 .414.336.75.75.75h.75m-1.5-1.5h.375c.621 0 1.125.504 1.125 1.125v9.75c0 .621-.504 1.125-1.125 1.125h-.375m1.5-1.5H21a.75.75 0 00-.75.75v.75m0 0H3.75m0 0h-.375a1.125 1.125 0 01-1.125-1.125V15m1.5 1.5v-.75A.75.75 0 003 15h-.75M15 10.5a3 3 0 11-6 0 3 3 0 016 0zm3 0h.008v.008H18V10.5zm-12 0h.008v.008H6V10.5z" />
-  </svg>
-);
-
-const icons: Record<string, () => React.ReactElement> = {
-  rendiciones: IconRendiciones,
-  reportes: IconReportes,
-  usuarios: IconUsuarios,
-  misgastos: IconMisGastos,
-};
 
 export default function Navbar() {
   const { data: session } = useSession();
@@ -50,6 +18,8 @@ export default function Navbar() {
   const [pwError, setPwError] = useState("");
   const [pwSuccess, setPwSuccess] = useState("");
   const [pwLoading, setPwLoading] = useState(false);
+  const [showUserMenu, setShowUserMenu] = useState(false);
+  const menuRef = useRef<HTMLDivElement>(null);
 
   const handleChangePassword = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -88,117 +58,187 @@ export default function Navbar() {
 
   const navItems = isAdmin
     ? [
-        { href: "/app/admin", label: "Rendiciones", iconKey: "rendiciones" },
-        { href: "/app/admin/reports", label: "Reportes", iconKey: "reportes" },
-        { href: "/app/admin/users", label: "Usuarios", iconKey: "usuarios" },
-        { href: "/app/dashboard", label: "Mis Gastos", iconKey: "misgastos" },
+        { href: "/app/admin", label: "Rendiciones" },
+        { href: "/app/admin/reports", label: "Reportes" },
+        { href: "/app/admin/users", label: "Usuarios" },
+        { href: "/app/dashboard", label: "Mis Gastos" },
       ]
     : [
-        { href: "/app/dashboard", label: "Mis Gastos", iconKey: "misgastos" },
+        { href: "/app/dashboard", label: "Mis Gastos" },
       ];
 
+  const userInitial = session?.user?.name?.[0]?.toUpperCase() || "U";
+
+  // Close menu when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (menuRef.current && !menuRef.current.contains(e.target as Node)) {
+        setShowUserMenu(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
   return (
-    <header className="bg-white sticky top-0 z-50 shadow-md border-b border-gray-200">
+    <header className="bg-white sticky top-0 z-50 border-b border-slate-200 shadow-sm">
       <div className="max-w-7xl mx-auto px-4">
-        <div className="flex items-center justify-between h-14">
-          <div className="flex items-center gap-2">
-            <Link href={isAdmin ? "/app/admin" : "/app/dashboard"} className="flex items-center gap-2">
-              <Image src="/logo.png" alt={APP_NAME} width={90} height={28} className="h-7 w-auto" />
-            </Link>
+        <div className="flex items-center justify-between h-16">
+          {/* Logo */}
+          <Link href={isAdmin ? "/app/admin" : "/app/dashboard"} className="flex items-center gap-2">
+            <Image src="/logo.png" alt={APP_NAME} width={90} height={28} className="h-6 w-auto" />
             {plan === "FREE" && (
-              <span className="text-[10px] bg-yellow-400 text-yellow-900 px-1.5 py-0.5 rounded-full font-bold">FREE</span>
+              <span className="text-xs bg-amber-100 text-amber-700 px-2 py-0.5 rounded-md font-medium">FREE</span>
             )}
-          </div>
-          <div className="flex items-center gap-2">
-            <span className="text-xs text-gray-500 hidden sm:block">{session?.user?.name}</span>
-            <button
-              onClick={() => { setPwError(""); setPwSuccess(""); setPwForm({ currentPassword: "", newPassword: "", confirmPassword: "" }); setShowPasswordModal(true); }}
-              className="text-xs text-gray-600 bg-gray-100 hover:bg-gray-200 px-2.5 py-1.5 rounded-lg transition-colors"
-              title="Cambiar contraseña"
-            >
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z" />
-              </svg>
-            </button>
-            <button
-              onClick={() => signOut({ callbackUrl: "/login" })}
-              className="text-xs text-gray-600 bg-gray-100 hover:bg-gray-200 px-3 py-1.5 rounded-lg transition-colors"
-            >
-              Salir
-            </button>
+          </Link>
+
+          {/* Nav Items Desktop */}
+          <nav className="hidden sm:flex items-center gap-8">
+            {navItems.map((item) => {
+              const isActive = pathname === item.href || pathname.startsWith(item.href + "/");
+              return (
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  className={`text-sm font-medium transition-colors pb-3 border-b-2 ${
+                    isActive
+                      ? "border-[#4A90D9] text-slate-900"
+                      : "border-transparent text-slate-600 hover:text-slate-900"
+                  }`}
+                >
+                  {item.label}
+                </Link>
+              );
+            })}
+          </nav>
+
+          {/* User Menu */}
+          <div className="flex items-center gap-3">
+            <div className="relative" ref={menuRef}>
+              <button
+                onClick={() => setShowUserMenu(!showUserMenu)}
+                className="flex items-center justify-center w-9 h-9 rounded-full bg-gradient-to-br from-[#4A90D9] to-[#3A7BC8] text-white font-medium text-sm hover:shadow-md transition-shadow"
+                title={session?.user?.name}
+              >
+                {userInitial}
+              </button>
+
+              {/* Dropdown Menu */}
+              {showUserMenu && (
+                <div className="absolute right-0 mt-2 w-48 bg-white rounded-xl shadow-lg border border-slate-200 py-2 z-50">
+                  <div className="px-4 py-3 border-b border-slate-100">
+                    <p className="text-sm font-medium text-slate-900">{session?.user?.name}</p>
+                    <p className="text-xs text-slate-500">{session?.user?.email}</p>
+                  </div>
+                  <button
+                    onClick={() => {
+                      setPwError("");
+                      setPwSuccess("");
+                      setPwForm({ currentPassword: "", newPassword: "", confirmPassword: "" });
+                      setShowPasswordModal(true);
+                      setShowUserMenu(false);
+                    }}
+                    className="w-full text-left px-4 py-2.5 text-sm text-slate-700 hover:bg-slate-50 transition-colors flex items-center gap-2"
+                  >
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z" />
+                    </svg>
+                    Cambiar contraseña
+                  </button>
+                  <button
+                    onClick={() => signOut({ callbackUrl: "/login" })}
+                    className="w-full text-left px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 transition-colors flex items-center gap-2 border-t border-slate-100"
+                  >
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                    </svg>
+                    Salir
+                  </button>
+                </div>
+              )}
+            </div>
           </div>
         </div>
-      </div>
-      <nav className="bg-[#4A90D9]">
-        <div className="max-w-7xl mx-auto px-4 flex gap-1 overflow-x-auto">
+
+        {/* Mobile Nav */}
+        <nav className="sm:hidden flex overflow-x-auto gap-2 pb-3 border-t border-slate-100 pt-2 -mx-4 px-4">
           {navItems.map((item) => {
-            const Icon = icons[item.iconKey];
+            const isActive = pathname === item.href || pathname.startsWith(item.href + "/");
             return (
               <Link
                 key={item.href}
                 href={item.href}
-                className={`flex items-center gap-1.5 px-4 py-2.5 text-sm font-medium whitespace-nowrap transition-colors ${
-                  pathname === item.href
-                    ? "bg-[#3A7BC8] text-white"
-                    : "text-blue-100 hover:text-white hover:bg-[#3A7BC8]/50"
+                className={`flex text-xs font-medium px-3 py-2 rounded-lg whitespace-nowrap transition-colors ${
+                  isActive
+                    ? "bg-[#4A90D9] text-white"
+                    : "bg-slate-100 text-slate-700"
                 }`}
               >
-                <Icon />
                 {item.label}
               </Link>
             );
           })}
-        </div>
-      </nav>
-      <InstallBanner />
+        </nav>
+      </div>
 
+      {/* Password Change Modal */}
       {showPasswordModal && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-[100] p-4">
           <div className="bg-white rounded-2xl p-6 w-full max-w-sm">
-            <h3 className="text-lg font-bold text-gray-900 mb-4">Cambiar Contraseña</h3>
+            <h3 className="text-lg font-bold text-slate-900 mb-4">Cambiar Contraseña</h3>
             <form onSubmit={handleChangePassword} className="space-y-3">
               <div>
-                <label className="block text-xs font-medium text-gray-500 mb-1">Contraseña actual</label>
+                <label className="block text-xs font-medium text-slate-700 mb-1">Contraseña Actual</label>
                 <input
                   type="password"
                   value={pwForm.currentPassword}
                   onChange={(e) => setPwForm({ ...pwForm, currentPassword: e.target.value })}
-                  className="w-full px-3 py-2.5 rounded-xl border border-gray-300 text-sm text-gray-900 outline-none focus:ring-2 focus:ring-[#4A90D9]"
+                  className="w-full px-3 py-2 rounded-lg border border-slate-300 focus:ring-2 focus:ring-[#4A90D9] focus:border-transparent outline-none text-slate-900"
                   required
                   autoComplete="current-password"
                 />
               </div>
               <div>
-                <label className="block text-xs font-medium text-gray-500 mb-1">Nueva contraseña</label>
+                <label className="block text-xs font-medium text-slate-700 mb-1">Nueva Contraseña</label>
                 <input
                   type="password"
                   value={pwForm.newPassword}
                   onChange={(e) => setPwForm({ ...pwForm, newPassword: e.target.value })}
-                  className="w-full px-3 py-2.5 rounded-xl border border-gray-300 text-sm text-gray-900 outline-none focus:ring-2 focus:ring-[#4A90D9]"
+                  className="w-full px-3 py-2 rounded-lg border border-slate-300 focus:ring-2 focus:ring-[#4A90D9] focus:border-transparent outline-none text-slate-900"
                   required
                   minLength={6}
                   autoComplete="new-password"
                 />
               </div>
               <div>
-                <label className="block text-xs font-medium text-gray-500 mb-1">Confirmar nueva contraseña</label>
+                <label className="block text-xs font-medium text-slate-700 mb-1">Confirmar Contraseña</label>
                 <input
                   type="password"
                   value={pwForm.confirmPassword}
                   onChange={(e) => setPwForm({ ...pwForm, confirmPassword: e.target.value })}
-                  className="w-full px-3 py-2.5 rounded-xl border border-gray-300 text-sm text-gray-900 outline-none focus:ring-2 focus:ring-[#4A90D9]"
+                  className="w-full px-3 py-2 rounded-lg border border-slate-300 focus:ring-2 focus:ring-[#4A90D9] focus:border-transparent outline-none text-slate-900"
                   required
                   minLength={6}
                   autoComplete="new-password"
                 />
               </div>
-              {pwError && <div className="bg-red-50 text-red-600 text-sm p-3 rounded-xl text-center">{pwError}</div>}
-              {pwSuccess && <div className="bg-green-50 text-green-600 text-sm p-3 rounded-xl text-center">{pwSuccess}</div>}
-              <div className="flex gap-3 pt-2">
-                <button type="button" onClick={() => setShowPasswordModal(false)} className="flex-1 py-2.5 rounded-xl border border-gray-300 text-gray-700 text-sm font-medium">
+
+              {pwError && <div className="bg-red-50 text-red-600 text-xs p-2 rounded-lg">{pwError}</div>}
+              {pwSuccess && <div className="bg-green-50 text-green-600 text-xs p-2 rounded-lg">{pwSuccess}</div>}
+
+              <div className="flex gap-2 pt-4">
+                <button
+                  type="button"
+                  onClick={() => setShowPasswordModal(false)}
+                  className="flex-1 px-4 py-2.5 rounded-lg border border-slate-300 text-slate-700 text-sm font-medium hover:bg-slate-50"
+                >
                   Cancelar
                 </button>
-                <button type="submit" disabled={pwLoading} className="flex-1 py-2.5 rounded-xl bg-[#4A90D9] text-white text-sm font-medium hover:bg-[#3A7BC8] disabled:opacity-50">
+                <button
+                  type="submit"
+                  disabled={pwLoading}
+                  className="flex-1 px-4 py-2.5 rounded-lg bg-[#4A90D9] text-white text-sm font-medium hover:bg-[#3A7BC8] disabled:opacity-50"
+                >
                   {pwLoading ? "Guardando..." : "Cambiar"}
                 </button>
               </div>

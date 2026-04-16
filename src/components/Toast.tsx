@@ -8,10 +8,10 @@ interface ToastProps {
   onClose: () => void;
 }
 
-const colors = {
-  success: "bg-green-600",
-  error: "bg-red-600",
-  info: "bg-blue-600",
+const dotColors = {
+  success: "bg-green-400",
+  error: "bg-red-400",
+  info: "bg-blue-400",
 };
 
 export default function Toast({ message, type = "success", onClose }: ToastProps) {
@@ -27,12 +27,13 @@ export default function Toast({ message, type = "success", onClose }: ToastProps
   }, [onClose]);
 
   return (
-    <div className="fixed top-4 right-4 z-[100]">
+    <div className="fixed bottom-4 right-4 z-[100]">
       <div
-        className={`${colors[type]} text-white px-4 py-3 rounded-xl shadow-lg text-sm font-medium transition-all duration-300 ${
-          visible ? "opacity-100 translate-y-0" : "opacity-0 -translate-y-2"
+        className={`bg-slate-900 text-white px-4 py-3 rounded-xl shadow-xl text-sm font-medium transition-all duration-300 flex items-center gap-2 ${
+          visible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-2"
         }`}
       >
+        <span className={`h-2 w-2 rounded-full ${dotColors[type]}`}></span>
         {message}
       </div>
     </div>
