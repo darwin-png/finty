@@ -91,10 +91,10 @@ export default function Dashboard() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50">
+      <div className="min-h-screen bg-slate-50">
         <Navbar />
         <div className="flex items-center justify-center h-64">
-          <div className="text-gray-400">Cargando...</div>
+          <div className="text-slate-400">Cargando...</div>
         </div>
       </div>
     );
@@ -108,20 +108,20 @@ export default function Dashboard() {
   const totalPagado = paid.reduce((s, e) => s + e.amount, 0);
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-slate-50">
       <Navbar />
       <main className="max-w-4xl mx-auto p-4">
         {/* Summary Cards */}
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-4">
-          <div className="bg-gray-50 border border-gray-200 rounded-2xl p-3">
-            <div className="text-xs text-gray-500 font-medium">Total del Mes</div>
-            <div className="text-lg font-bold text-gray-900">{formatCLP(totalMes)}</div>
+          <div className="bg-slate-50 border border-slate-200 rounded-2xl p-3">
+            <div className="text-xs text-slate-500 font-medium">Total del Mes</div>
+            <div className="text-lg font-bold text-slate-900">{formatCLP(totalMes)}</div>
           </div>
-          <div className="bg-yellow-50 border border-yellow-200 rounded-2xl p-3">
+          <div className="bg-amber-50 border border-amber-200 rounded-xl p-5">
             <div className="text-xs text-yellow-600 font-medium">Pendiente</div>
             <div className="text-lg font-bold text-yellow-800">{formatCLP(totalPendiente)}</div>
           </div>
-          <div className="bg-green-50 border border-green-200 rounded-2xl p-3">
+          <div className="bg-green-50 border border-green-200 rounded-xl p-5">
             <div className="text-xs text-green-600 font-medium">Aprobado</div>
             <div className="text-lg font-bold text-green-800">{formatCLP(totalAprobado)}</div>
           </div>
@@ -144,8 +144,8 @@ export default function Dashboard() {
 
         {/* Active Expenses */}
         {active.length === 0 && paid.length === 0 ? (
-          <div className="text-center py-12 text-gray-400">
-            <svg className="w-16 h-16 mx-auto mb-4 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <div className="text-center py-12 text-slate-400">
+            <svg className="w-16 h-16 mx-auto mb-4 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
             </svg>
             <p>No tienes rendiciones aún</p>
@@ -156,19 +156,19 @@ export default function Dashboard() {
             {active.length > 0 && (
               <div className="space-y-3 mb-6">
                 {active.map((expense) => (
-                  <div key={expense.id} className="bg-white rounded-2xl p-4 shadow-sm border">
+                  <div key={expense.id} className="bg-white rounded-xl p-5 shadow-sm border border-slate-200">
                     <div className="flex items-start justify-between">
                       <div className="flex-1">
                         <div className="flex items-center gap-2 mb-1">
-                          <span className="text-sm font-semibold text-gray-900">
+                          <span className="text-sm font-semibold text-slate-900">
                             {categoryLabels[expense.category] || expense.category}
                           </span>
                           <StatusBadge status={expense.status} />
                         </div>
                         {expense.description && (
-                          <p className="text-sm text-gray-500">{expense.description}</p>
+                          <p className="text-sm text-slate-500">{expense.description}</p>
                         )}
-                        <p className="text-xs text-gray-400 mt-1">
+                        <p className="text-xs text-slate-400 mt-1">
                           {formatDate(expense.date)}
                           {expense.proveedor && ` · ${expense.proveedor}`}
                         </p>
@@ -179,16 +179,16 @@ export default function Dashboard() {
                         )}
                       </div>
                       <div className="text-right">
-                        <div className="text-lg font-bold text-gray-900">{formatCLP(expense.amount)}</div>
+                        <div className="text-lg font-bold text-slate-900">{formatCLP(expense.amount)}</div>
                         <div className="flex gap-2 mt-2">
                           {expense.receipt && (
-                            <a href={`/api/files/${expense.id}`} target="_blank" rel="noopener noreferrer" className="text-xs text-blue-600 hover:underline">
+                            <a href={`/api/files/${expense.id}`} target="_blank" rel="noopener noreferrer" className="text-xs text-blue-600 hover:text-blue-700 font-medium">
                               Ver
                             </a>
                           )}
                           {expense.status === "PENDIENTE" && (
                             <>
-                              <button onClick={() => openEdit(expense)} className="text-xs text-gray-600 hover:underline">
+                              <button onClick={() => openEdit(expense)} className="text-xs text-slate-600 hover:underline">
                                 Editar
                               </button>
                               <button onClick={() => handleDelete(expense.id)} className="text-xs text-red-500 hover:underline">
@@ -207,22 +207,22 @@ export default function Dashboard() {
             {/* Paid Section */}
             {paid.length > 0 && (
               <>
-                <h2 className="text-sm font-semibold text-gray-500 mb-3 uppercase tracking-wide">Pagados</h2>
+                <h2 className="text-sm font-semibold text-slate-500 mb-3 uppercase tracking-wide">Pagados</h2>
                 <div className="space-y-3">
                   {paid.map((expense) => (
                     <div key={expense.id} className="bg-blue-50 rounded-2xl p-4 border border-blue-200">
                       <div className="flex items-start justify-between">
                         <div className="flex-1">
                           <div className="flex items-center gap-2 mb-1">
-                            <span className="text-sm font-semibold text-gray-900">
+                            <span className="text-sm font-semibold text-slate-900">
                               {categoryLabels[expense.category] || expense.category}
                             </span>
                             <StatusBadge status={expense.status} />
                           </div>
                           {expense.description && (
-                            <p className="text-sm text-gray-500">{expense.description}</p>
+                            <p className="text-sm text-slate-500">{expense.description}</p>
                           )}
-                          <p className="text-xs text-gray-400 mt-1">
+                          <p className="text-xs text-slate-400 mt-1">
                             {formatDate(expense.date)}
                             {expense.paidAt && ` · Pagado ${formatDate(expense.paidAt)}`}
                           </p>
@@ -242,24 +242,24 @@ export default function Dashboard() {
       {editModal.open && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-2xl p-6 w-full max-w-sm max-h-[90vh] overflow-y-auto">
-            <h3 className="text-lg font-bold text-gray-900 mb-4">Editar Rendición</h3>
+            <h3 className="text-lg font-bold text-slate-900 mb-4">Editar Rendición</h3>
             <form onSubmit={handleEditSubmit} className="space-y-3">
               <div>
-                <label className="block text-xs font-medium text-gray-500 mb-1">Monto ($)</label>
+                <label className="block text-xs font-medium text-slate-500 mb-1">Monto ($)</label>
                 <input
                   type="number"
                   value={editForm.amount}
                   onChange={(e) => setEditForm({ ...editForm, amount: e.target.value })}
-                  className="w-full px-3 py-2.5 rounded-xl border border-gray-300 text-sm text-gray-900 outline-none focus:ring-2 focus:ring-sky-500"
+                  className="w-full px-3 py-2.5 rounded-xl border border-slate-300 text-sm text-slate-900 outline-none focus:ring-2 focus:ring-sky-500"
                   required
                 />
               </div>
               <div>
-                <label className="block text-xs font-medium text-gray-500 mb-1">Cuenta</label>
+                <label className="block text-xs font-medium text-slate-500 mb-1">Cuenta</label>
                 <select
                   value={editForm.category}
                   onChange={(e) => setEditForm({ ...editForm, category: e.target.value })}
-                  className="w-full px-3 py-2.5 rounded-xl border border-gray-300 text-sm text-gray-900"
+                  className="w-full px-3 py-2.5 rounded-xl border border-slate-300 text-sm text-slate-900"
                   required
                 >
                   <option value="">Seleccionar</option>
@@ -269,11 +269,11 @@ export default function Dashboard() {
                 </select>
               </div>
               <div>
-                <label className="block text-xs font-medium text-gray-500 mb-1">Tipo Documento</label>
+                <label className="block text-xs font-medium text-slate-500 mb-1">Tipo Documento</label>
                 <select
                   value={editForm.tipoDocumento}
                   onChange={(e) => setEditForm({ ...editForm, tipoDocumento: e.target.value })}
-                  className="w-full px-3 py-2.5 rounded-xl border border-gray-300 text-sm text-gray-900"
+                  className="w-full px-3 py-2.5 rounded-xl border border-slate-300 text-sm text-slate-900"
                 >
                   <option value="">Seleccionar</option>
                   {TIPOS_DOCUMENTO.map((t) => (
@@ -282,44 +282,44 @@ export default function Dashboard() {
                 </select>
               </div>
               <div>
-                <label className="block text-xs font-medium text-gray-500 mb-1">Proveedor</label>
+                <label className="block text-xs font-medium text-slate-500 mb-1">Proveedor</label>
                 <input
                   type="text"
                   value={editForm.proveedor}
                   onChange={(e) => setEditForm({ ...editForm, proveedor: e.target.value })}
-                  className="w-full px-3 py-2.5 rounded-xl border border-gray-300 text-sm text-gray-900 outline-none focus:ring-2 focus:ring-sky-500"
+                  className="w-full px-3 py-2.5 rounded-xl border border-slate-300 text-sm text-slate-900 outline-none focus:ring-2 focus:ring-sky-500"
                 />
               </div>
               <div>
-                <label className="block text-xs font-medium text-gray-500 mb-1">N° Documento</label>
+                <label className="block text-xs font-medium text-slate-500 mb-1">N° Documento</label>
                 <input
                   type="text"
                   value={editForm.numeroDocumento}
                   onChange={(e) => setEditForm({ ...editForm, numeroDocumento: e.target.value })}
-                  className="w-full px-3 py-2.5 rounded-xl border border-gray-300 text-sm text-gray-900 outline-none focus:ring-2 focus:ring-sky-500"
+                  className="w-full px-3 py-2.5 rounded-xl border border-slate-300 text-sm text-slate-900 outline-none focus:ring-2 focus:ring-sky-500"
                 />
               </div>
               <div>
-                <label className="block text-xs font-medium text-gray-500 mb-1">Fecha</label>
+                <label className="block text-xs font-medium text-slate-500 mb-1">Fecha</label>
                 <input
                   type="date"
                   value={editForm.date}
                   onChange={(e) => setEditForm({ ...editForm, date: e.target.value })}
-                  className="w-full px-3 py-2.5 rounded-xl border border-gray-300 text-sm text-gray-900 outline-none focus:ring-2 focus:ring-sky-500"
+                  className="w-full px-3 py-2.5 rounded-xl border border-slate-300 text-sm text-slate-900 outline-none focus:ring-2 focus:ring-sky-500"
                   required
                 />
               </div>
               <div>
-                <label className="block text-xs font-medium text-gray-500 mb-1">Descripción</label>
+                <label className="block text-xs font-medium text-slate-500 mb-1">Descripción</label>
                 <input
                   type="text"
                   value={editForm.description}
                   onChange={(e) => setEditForm({ ...editForm, description: e.target.value })}
-                  className="w-full px-3 py-2.5 rounded-xl border border-gray-300 text-sm text-gray-900 outline-none focus:ring-2 focus:ring-sky-500"
+                  className="w-full px-3 py-2.5 rounded-xl border border-slate-300 text-sm text-slate-900 outline-none focus:ring-2 focus:ring-sky-500"
                 />
               </div>
               <div className="flex gap-3 pt-2">
-                <button type="button" onClick={() => setEditModal({ open: false })} className="flex-1 py-2.5 rounded-xl border border-gray-300 text-gray-700 text-sm font-medium">
+                <button type="button" onClick={() => setEditModal({ open: false })} className="flex-1 py-2.5 rounded-xl border border-slate-300 text-gray-700 text-sm font-medium">
                   Cancelar
                 </button>
                 <button type="submit" disabled={saving} className="flex-1 py-2.5 rounded-xl bg-sky-500 text-white text-sm font-medium hover:bg-sky-600 disabled:opacity-50">

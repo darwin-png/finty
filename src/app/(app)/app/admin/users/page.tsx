@@ -116,7 +116,7 @@ export default function UsersPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-slate-50">
       <Navbar />
 
       {/* Toast */}
@@ -127,7 +127,7 @@ export default function UsersPage() {
       )}
       <main className="max-w-4xl mx-auto p-4">
         <div className="flex items-center justify-between mb-4">
-          <h1 className="text-xl font-bold text-gray-900">Usuarios</h1>
+          <h1 className="text-xl font-bold text-slate-900">Usuarios</h1>
           <button onClick={openCreate} className="px-4 py-2 bg-sky-500 text-white text-sm rounded-xl hover:bg-sky-600 font-medium">
             Nuevo Usuario
           </button>
@@ -140,20 +140,20 @@ export default function UsersPage() {
             {users.map((user) => (
               <div key={user.id} className="bg-white rounded-2xl p-4 shadow-sm border flex items-center justify-between">
                 <div>
-                  <div className="font-semibold text-gray-900">{user.name}</div>
-                  <div className="text-sm text-gray-500">@{user.username}</div>
+                  <div className="font-semibold text-slate-900">{user.name}</div>
+                  <div className="text-sm text-slate-500">@{user.username}</div>
                   {user.email && <div className="text-xs text-gray-400">{user.email}</div>}
                   <div className="flex gap-2 mt-1">
                     <span className={`text-xs px-2 py-0.5 rounded-full ${user.role === "ADMINISTRADOR" ? "bg-purple-100 text-purple-800" : "bg-blue-100 text-blue-800"}`}>
                       {user.role === "ADMINISTRADOR" ? "Admin" : "Colaborador"}
                     </span>
-                    <span className={`text-xs px-2 py-0.5 rounded-full ${user.active ? "bg-green-100 text-green-800" : "bg-gray-100 text-gray-500"}`}>
+                    <span className={`text-xs px-2 py-0.5 rounded-full ${user.active ? "bg-green-100 text-green-800" : "bg-slate-100 text-slate-500"}`}>
                       {user.active ? "Activo" : "Inactivo"}
                     </span>
                   </div>
                 </div>
                 <div className="flex gap-2">
-                  <button onClick={() => openEdit(user)} className="text-xs bg-gray-100 text-gray-700 px-3 py-2 rounded-xl hover:bg-gray-200">Editar</button>
+                  <button onClick={() => openEdit(user)} className="text-xs bg-slate-100 text-slate-700 px-3 py-2 rounded-xl hover:bg-gray-200">Editar</button>
                   <button onClick={() => { setResetModal({ open: true, user }); setNewPassword(""); }} className="text-xs bg-yellow-100 text-yellow-700 px-3 py-2 rounded-xl hover:bg-yellow-200">Clave</button>
                   <button onClick={() => toggleActive(user)} className={`text-xs px-3 py-2 rounded-xl ${user.active ? "bg-red-100 text-red-700 hover:bg-red-200" : "bg-green-100 text-green-700 hover:bg-green-200"}`}>
                     {user.active ? "Desactivar" : "Activar"}
@@ -168,8 +168,8 @@ export default function UsersPage() {
       {resetModal.open && resetModal.user && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-2xl p-6 w-full max-w-sm">
-            <h3 className="text-lg font-bold text-gray-900 mb-1">Cambiar Contraseña</h3>
-            <p className="text-sm text-gray-500 mb-4">
+            <h3 className="text-lg font-bold text-slate-900 mb-1">Cambiar Contraseña</h3>
+            <p className="text-sm text-slate-500 mb-4">
               <strong>{resetModal.user.name}</strong> · @{resetModal.user.username}
             </p>
             <div className="relative mb-4">
@@ -178,14 +178,14 @@ export default function UsersPage() {
                 value={newPassword}
                 onChange={(e) => setNewPassword(e.target.value)}
                 placeholder="Nueva contraseña (mín. 6 caracteres)"
-                className="w-full px-3 py-2.5 pr-10 rounded-xl border border-gray-300 text-sm text-gray-900 outline-none focus:ring-2 focus:ring-sky-500"
+                className="w-full px-3 py-2.5 pr-10 rounded-xl border border-slate-300 text-sm text-slate-900 outline-none focus:ring-2 focus:ring-sky-500"
                 autoFocus
                 onKeyDown={(e) => e.key === "Enter" && handleResetPassword()}
               />
               <button
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 text-xs"
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-slate-600 text-xs"
               >
                 {showPassword ? "Ocultar" : "Ver"}
               </button>
@@ -196,7 +196,7 @@ export default function UsersPage() {
             <div className="flex gap-3">
               <button
                 onClick={() => { setResetModal({ open: false }); setNewPassword(""); setShowPassword(false); }}
-                className="flex-1 py-2.5 rounded-xl border border-gray-300 text-gray-700 text-sm font-medium"
+                className="flex-1 py-2.5 rounded-xl border border-slate-300 text-slate-700 text-sm font-medium"
               >
                 Cancelar
               </button>
@@ -215,15 +215,15 @@ export default function UsersPage() {
       {modal.open && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-2xl p-6 w-full max-w-sm">
-            <h3 className="text-lg font-bold text-gray-900 mb-4">
+            <h3 className="text-lg font-bold text-slate-900 mb-4">
               {modal.mode === "create" ? "Nuevo Usuario" : "Editar Usuario"}
             </h3>
             <form onSubmit={handleSubmit} className="space-y-3">
-              <input type="text" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} placeholder="Nombre completo" className="w-full px-3 py-2.5 rounded-xl border border-gray-300 text-sm text-gray-900 outline-none focus:ring-2 focus:ring-sky-500" required />
-              <input type="text" value={form.username} onChange={(e) => setForm({ ...form, username: e.target.value })} placeholder="Usuario" className="w-full px-3 py-2.5 rounded-xl border border-gray-300 text-sm text-gray-900 outline-none focus:ring-2 focus:ring-sky-500" required />
-              <input type="email" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} placeholder="Email" className="w-full px-3 py-2.5 rounded-xl border border-gray-300 text-sm text-gray-900 outline-none focus:ring-2 focus:ring-sky-500" />
-              <input type="password" value={form.password} onChange={(e) => setForm({ ...form, password: e.target.value })} placeholder={modal.mode === "edit" ? "Nueva contraseña (dejar vacío para mantener)" : "Contraseña"} className="w-full px-3 py-2.5 rounded-xl border border-gray-300 text-sm text-gray-900 outline-none focus:ring-2 focus:ring-sky-500" required={modal.mode === "create"} />
-              <select value={form.role} onChange={(e) => setForm({ ...form, role: e.target.value })} className="w-full px-3 py-2.5 rounded-xl border border-gray-300 text-sm text-gray-900">
+              <input type="text" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} placeholder="Nombre completo" className="w-full px-3 py-2.5 rounded-xl border border-slate-300 text-sm text-slate-900 outline-none focus:ring-2 focus:ring-sky-500" required />
+              <input type="text" value={form.username} onChange={(e) => setForm({ ...form, username: e.target.value })} placeholder="Usuario" className="w-full px-3 py-2.5 rounded-xl border border-slate-300 text-sm text-slate-900 outline-none focus:ring-2 focus:ring-sky-500" required />
+              <input type="email" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} placeholder="Email" className="w-full px-3 py-2.5 rounded-xl border border-slate-300 text-sm text-slate-900 outline-none focus:ring-2 focus:ring-sky-500" />
+              <input type="password" value={form.password} onChange={(e) => setForm({ ...form, password: e.target.value })} placeholder={modal.mode === "edit" ? "Nueva contraseña (dejar vacío para mantener)" : "Contraseña"} className="w-full px-3 py-2.5 rounded-xl border border-slate-300 text-sm text-slate-900 outline-none focus:ring-2 focus:ring-sky-500" required={modal.mode === "create"} />
+              <select value={form.role} onChange={(e) => setForm({ ...form, role: e.target.value })} className="w-full px-3 py-2.5 rounded-xl border border-slate-300 text-sm text-slate-900">
                 <option value="COLABORADOR">Colaborador</option>
                 <option value="ADMINISTRADOR">Administrador</option>
               </select>
@@ -231,7 +231,7 @@ export default function UsersPage() {
               {error && <div className="bg-red-50 text-red-600 text-sm p-2 rounded-xl">{error}</div>}
 
               <div className="flex gap-3 pt-2">
-                <button type="button" onClick={() => setModal({ open: false, mode: "create" })} className="flex-1 py-2.5 rounded-xl border border-gray-300 text-gray-700 text-sm font-medium">Cancelar</button>
+                <button type="button" onClick={() => setModal({ open: false, mode: "create" })} className="flex-1 py-2.5 rounded-xl border border-slate-300 text-slate-700 text-sm font-medium">Cancelar</button>
                 <button type="submit" disabled={saving} className="flex-1 py-2.5 rounded-xl bg-sky-500 text-white text-sm font-medium hover:bg-sky-600 disabled:opacity-50">{saving ? "Guardando..." : "Guardar"}</button>
               </div>
             </form>

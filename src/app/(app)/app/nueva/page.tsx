@@ -105,15 +105,15 @@ export default function NuevaRendicion() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-slate-50">
       <Navbar />
       <main className="max-w-lg mx-auto p-4">
-        <h1 className="text-xl font-bold text-gray-900 mb-4">Nueva Rendición</h1>
+        <h1 className="text-xl font-bold text-slate-900 mb-4">Nueva Rendición</h1>
 
         <form onSubmit={handleSubmit} className="space-y-4">
           {/* Comprobante */}
-          <div className="bg-white rounded-2xl p-4 shadow-sm border">
-            <label className="block text-sm font-medium text-gray-700 mb-3">Comprobante</label>
+          <div className="bg-white rounded-xl p-5 shadow-sm border border-slate-200">
+            <label className="block text-sm font-medium text-slate-700 mb-3">Comprobante</label>
 
             {preview && (
               <div className="mb-3 relative">
@@ -141,7 +141,7 @@ export default function NuevaRendicion() {
                   type="button"
                   onClick={() => cameraInputRef.current?.click()}
                   disabled={uploading}
-                  className="flex flex-col items-center justify-center gap-2 p-4 border-2 border-dashed border-sky-300 rounded-xl text-sky-600 hover:bg-sky-50 transition-colors"
+                  className="flex flex-col items-center justify-center gap-2 p-6 border-2 border-dashed border-slate-300 rounded-xl text-slate-600 hover:bg-slate-50 transition-colors"
                 >
                   <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
@@ -154,7 +154,7 @@ export default function NuevaRendicion() {
                   type="button"
                   onClick={() => fileInputRef.current?.click()}
                   disabled={uploading}
-                  className="flex flex-col items-center justify-center gap-2 p-4 border-2 border-dashed border-gray-300 rounded-xl text-gray-600 hover:bg-gray-50 transition-colors"
+                  className="flex flex-col items-center justify-center gap-2 p-4 border-2 border-dashed border-slate-300 rounded-xl text-slate-600 hover:bg-slate-50 transition-colors"
                 >
                   <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
@@ -165,7 +165,7 @@ export default function NuevaRendicion() {
             )}
 
             {uploading && (
-              <div className="mt-3 text-center text-sm text-gray-500">Subiendo archivo...</div>
+              <div className="mt-3 text-center text-sm text-slate-500">Subiendo archivo...</div>
             )}
 
             <input ref={cameraInputRef} type="file" accept="image/*" capture="environment" onChange={handleFileChange} className="hidden" />
@@ -173,8 +173,8 @@ export default function NuevaRendicion() {
           </div>
 
           {/* Monto */}
-          <div className="bg-white rounded-2xl p-4 shadow-sm border">
-            <label className="block text-sm font-medium text-gray-700 mb-1">Monto ($)</label>
+          <div className="bg-white rounded-xl p-5 shadow-sm border border-slate-200">
+            <label className="block text-sm font-medium text-slate-700 mb-1">Monto ($)</label>
             <input
               type="text"
               inputMode="numeric"
@@ -184,14 +184,14 @@ export default function NuevaRendicion() {
                 setForm({ ...form, amount: raw });
               }}
               placeholder="$0"
-              className="w-full text-3xl font-bold text-gray-900 py-2 border-b-2 border-gray-200 focus:border-sky-500 outline-none"
+              className="w-full text-3xl font-bold text-slate-900 py-2 border-b-2 border-slate-200 focus:border-sky-500 outline-none"
               required
             />
           </div>
 
           {/* Cuenta */}
-          <div className="bg-white rounded-2xl p-4 shadow-sm border">
-            <label className="block text-sm font-medium text-gray-700 mb-3">Cuenta</label>
+          <div className="bg-white rounded-xl p-5 shadow-sm border border-slate-200">
+            <label className="block text-sm font-medium text-slate-700 mb-3">Cuenta</label>
             <div className="grid grid-cols-2 gap-2">
               {categories.map((cat) => (
                 <button
@@ -201,7 +201,7 @@ export default function NuevaRendicion() {
                   className={`px-3 py-2.5 rounded-xl text-xs font-medium transition-colors ${
                     form.category === cat.value
                       ? "bg-sky-500 text-white shadow-md"
-                      : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                      : "bg-slate-100 text-slate-700 hover:bg-slate-200"
                   }`}
                 >
                   {cat.label}
@@ -213,7 +213,7 @@ export default function NuevaRendicion() {
           {/* Tipo Documento y Proveedor */}
           <div className="bg-white rounded-2xl p-4 shadow-sm border space-y-3">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Tipo de Documento</label>
+              <label className="block text-sm font-medium text-slate-700 mb-2">Tipo de Documento</label>
               <div className="grid grid-cols-2 gap-2">
                 {TIPOS_DOCUMENTO.map((tipo) => (
                   <button
@@ -223,7 +223,7 @@ export default function NuevaRendicion() {
                     className={`px-3 py-2.5 rounded-xl text-sm font-medium transition-colors ${
                       form.tipoDocumento === tipo
                         ? "bg-sky-500 text-white shadow-md"
-                        : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                        : "bg-slate-100 text-slate-700 hover:bg-slate-200"
                     }`}
                   >
                     {tipo}
@@ -232,23 +232,23 @@ export default function NuevaRendicion() {
               </div>
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Proveedor</label>
+              <label className="block text-sm font-medium text-slate-700 mb-1">Proveedor</label>
               <input
                 type="text"
                 value={form.proveedor}
                 onChange={(e) => setForm({ ...form, proveedor: e.target.value })}
                 placeholder="Nombre del proveedor o comercio"
-                className="w-full px-3 py-2.5 rounded-xl border border-gray-300 focus:ring-2 focus:ring-sky-500 focus:border-transparent outline-none text-gray-900"
+                className="w-full px-3 py-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-sky-500 focus:border-transparent outline-none text-slate-900"
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">N° Documento (opcional)</label>
+              <label className="block text-sm font-medium text-slate-700 mb-1">N° Documento (opcional)</label>
               <input
                 type="text"
                 value={form.numeroDocumento}
                 onChange={(e) => setForm({ ...form, numeroDocumento: e.target.value })}
                 placeholder="Número de boleta o recibo"
-                className="w-full px-3 py-2.5 rounded-xl border border-gray-300 focus:ring-2 focus:ring-sky-500 focus:border-transparent outline-none text-gray-900"
+                className="w-full px-3 py-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-sky-500 focus:border-transparent outline-none text-slate-900"
               />
             </div>
           </div>
@@ -256,35 +256,35 @@ export default function NuevaRendicion() {
           {/* Fecha y Descripción */}
           <div className="bg-white rounded-2xl p-4 shadow-sm border space-y-3">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Fecha</label>
+              <label className="block text-sm font-medium text-slate-700 mb-1">Fecha</label>
               <input
                 type="date"
                 value={form.date}
                 onChange={(e) => setForm({ ...form, date: e.target.value })}
-                className="w-full px-3 py-2.5 rounded-xl border border-gray-300 focus:ring-2 focus:ring-sky-500 focus:border-transparent outline-none text-gray-900"
+                className="w-full px-3 py-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-sky-500 focus:border-transparent outline-none text-slate-900"
                 required
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Descripción (opcional)</label>
+              <label className="block text-sm font-medium text-slate-700 mb-1">Descripción (opcional)</label>
               <input
                 type="text"
                 value={form.description}
                 onChange={(e) => setForm({ ...form, description: e.target.value })}
                 placeholder="Ej: Taxi a reunión con cliente"
-                className="w-full px-3 py-2.5 rounded-xl border border-gray-300 focus:ring-2 focus:ring-sky-500 focus:border-transparent outline-none text-gray-900"
+                className="w-full px-3 py-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-sky-500 focus:border-transparent outline-none text-slate-900"
               />
             </div>
           </div>
 
           {error && (
-            <div className="bg-red-50 text-red-600 text-sm p-3 rounded-xl text-center">{error}</div>
+            <div className="bg-red-50 text-red-600 text-sm p-3 rounded-lg text-center">{error}</div>
           )}
 
           <button
             type="submit"
             disabled={saving}
-            className="w-full bg-sky-500 text-white py-4 rounded-2xl font-bold text-lg hover:bg-sky-600 transition-colors disabled:opacity-50 shadow-lg"
+            className="w-full bg-[#4A90D9] text-white py-3 rounded-xl font-semibold text-base hover:bg-[#3A7BC8] transition-colors disabled:opacity-50"
           >
             {saving ? "Guardando..." : "Guardar Rendición"}
           </button>
@@ -292,7 +292,7 @@ export default function NuevaRendicion() {
           <button
             type="button"
             onClick={() => router.back()}
-            className="w-full text-gray-500 py-2 text-sm"
+            className="w-full text-slate-500 py-2 text-sm"
           >
             Cancelar
           </button>

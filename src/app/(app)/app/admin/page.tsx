@@ -267,22 +267,22 @@ export default function AdminPanel() {
 
         {/* KPIs */}
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-4">
-          <div className="bg-yellow-50 border border-yellow-200 rounded-2xl p-3">
+          <div className="bg-amber-50 border border-amber-200 rounded-xl p-5">
             <div className="text-xs text-yellow-600 font-medium">Pendientes</div>
             <div className="text-lg font-bold text-yellow-800">{formatCLP(totalPendiente)}</div>
             <div className="text-xs text-yellow-600">{pendientes.length} gastos</div>
           </div>
-          <div className="bg-green-50 border border-green-200 rounded-2xl p-3">
+          <div className="bg-green-50 border border-green-200 rounded-xl p-5">
             <div className="text-xs text-green-600 font-medium">Por Pagar</div>
             <div className="text-lg font-bold text-green-800">{formatCLP(totalAprobado)}</div>
             <div className="text-xs text-green-600">{aprobados.length} gastos</div>
           </div>
-          <div className="bg-blue-50 border border-blue-200 rounded-2xl p-3">
+          <div className="bg-blue-50 border border-blue-200 rounded-xl p-5">
             <div className="text-xs text-blue-600 font-medium">Pagado</div>
             <div className="text-lg font-bold text-blue-800">{formatCLP(totalPagado)}</div>
             <div className="text-xs text-blue-600">{pagados.length} gastos</div>
           </div>
-          <div className="bg-red-50 border border-red-200 rounded-2xl p-3">
+          <div className="bg-red-50 border border-red-200 rounded-xl p-5">
             <div className="text-xs text-red-600 font-medium">Rechazado</div>
             <div className="text-lg font-bold text-red-800">{formatCLP(totalRechazado)}</div>
             <div className="text-xs text-red-600">{rechazados.length} gastos</div>
@@ -304,7 +304,7 @@ export default function AdminPanel() {
                   <button
                     onClick={() => setPayConfirm({ open: true, userId: u.userId, name: u.name, total: u.total, count: u.count })}
                     disabled={paying === u.userId}
-                    className="ml-3 px-4 py-2 bg-green-600 text-white text-sm font-medium rounded-xl hover:bg-green-700 disabled:opacity-50 disabled:cursor-wait"
+                    className="ml-3 px-4 py-2 bg-green-600 text-white text-sm font-medium rounded-lg hover:bg-green-700 disabled:opacity-50 disabled:cursor-wait"
                   >
                     {paying === u.userId ? "Pagando..." : "Pagar"}
                   </button>
@@ -315,16 +315,12 @@ export default function AdminPanel() {
         )}
 
         {/* Tabs */}
-        <div className="flex gap-1 bg-white rounded-2xl p-1 shadow-sm border mb-4">
+        <div className="flex gap-1 bg-slate-100 rounded-xl p-1 mb-4">
           {tabs.map((t) => (
             <button
               key={t.key}
               onClick={() => setTab(t.key)}
-              className={`flex-1 py-2.5 rounded-xl text-sm font-medium transition-colors ${
-                tab === t.key
-                  ? "bg-sky-500 text-white shadow-sm"
-                  : "text-gray-600 hover:bg-gray-100"
-              }`}
+              className={`flex-1 py-2.5 rounded-lg text-sm font-medium transition-colors ${tab === t.key ? "bg-white text-slate-900 shadow-sm" : "text-slate-600 hover:text-slate-900"}`}
             >
               {t.label} ({t.count})
             </button>
@@ -379,8 +375,8 @@ export default function AdminPanel() {
                         )}
                         {exp.status === "PENDIENTE" && (
                           <>
-                            <button onClick={() => handleApprove(exp.id)} className="text-xs bg-green-600 text-white px-3 py-1 rounded-lg hover:bg-green-700">Aprobar</button>
-                            <button onClick={() => setRejectModal({ id: exp.id, open: true })} className="text-xs bg-red-600 text-white px-3 py-1 rounded-lg hover:bg-red-700">Rechazar</button>
+                            <button onClick={() => handleApprove(exp.id)} className="text-xs bg-green-600 text-white px-2.5 py-1.5 rounded-lg hover:bg-green-700">Aprobar</button>
+                            <button onClick={() => setRejectModal({ id: exp.id, open: true })} className="text-xs bg-red-600 text-white px-2.5 py-1.5 rounded-lg hover:bg-red-700">Rechazar</button>
                           </>
                         )}
                         {exp.status === "APROBADO" && (
@@ -394,7 +390,7 @@ export default function AdminPanel() {
                         )}
                         <button
                           onClick={() => setDeleteModal({ id: exp.id, open: true })}
-                          className="text-xs bg-red-600 text-white px-3 py-1 rounded-lg hover:bg-red-700"
+                          className="text-xs bg-red-600 text-white px-2.5 py-1.5 rounded-lg hover:bg-red-700"
                         >
                           Eliminar
                         </button>
@@ -411,11 +407,11 @@ export default function AdminPanel() {
                 <table className="w-full">
                   <thead className="bg-gray-50">
                     <tr>
-                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-500">Usuario</th>
-                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-500">Fecha</th>
-                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-500">Cuenta</th>
-                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-500">Proveedor</th>
-                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-500">Descripción</th>
+                      <th className="px-4 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wide">Usuario</th>
+                      <th className="px-4 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wide">Fecha</th>
+                      <th className="px-4 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wide">Cuenta</th>
+                      <th className="px-4 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wide">Proveedor</th>
+                      <th className="px-4 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wide">Descripción</th>
                       <th className="px-4 py-3 text-right text-xs font-medium text-gray-500">Monto</th>
                       <th className="px-4 py-3 text-center text-xs font-medium text-gray-500">Comp.</th>
                       <th className="px-4 py-3 text-center text-xs font-medium text-gray-500">Estado</th>
@@ -426,7 +422,7 @@ export default function AdminPanel() {
                     {currentGrouped.map((group) => (
                       <React.Fragment key={group.userId}>
                         {/* Group header row */}
-                        <tr className="bg-sky-50 hover:bg-sky-100">
+                        <tr className="bg-slate-50 hover:bg-slate-100 border-l-2 border-l-\[#4A90D9\]">
                           <td colSpan={9} className="px-4 py-3">
                             <div className="text-sm font-semibold text-sky-900">{group.name}</div>
                             <div className="text-xs text-sky-600">
@@ -456,7 +452,7 @@ export default function AdminPanel() {
                             {exp.status === "PENDIENTE" && (
                               <>
                                 <button onClick={() => handleApprove(exp.id)} className="text-xs bg-green-600 text-white px-2 py-1 rounded-lg hover:bg-green-700">Aprobar</button>
-                                <button onClick={() => setRejectModal({ id: exp.id, open: true })} className="text-xs bg-red-600 text-white px-2 py-1 rounded-lg hover:bg-red-700">Rechazar</button>
+                                <button onClick={() => setRejectModal({ id: exp.id, open: true })} className="text-xs bg-red-600 text-white px-2.5 py-1.5 rounded-lg hover:bg-red-700">Rechazar</button>
                               </>
                             )}
                             {exp.status === "APROBADO" && (
@@ -466,7 +462,7 @@ export default function AdminPanel() {
                               </button>
                             )}
                             <button onClick={() => setDeleteModal({ id: exp.id, open: true })}
-                                    className="text-xs bg-red-600 text-white px-2 py-1 rounded-lg hover:bg-red-700">
+                                    className="text-xs bg-red-600 text-white px-2.5 py-1.5 rounded-lg hover:bg-red-700">
                               Eliminar
                             </button>
                           </div>
@@ -487,7 +483,7 @@ export default function AdminPanel() {
       {rejectModal.open && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-2xl p-6 w-full max-w-sm">
-            <h3 className="text-lg font-bold text-gray-900 mb-4">Rechazar Gasto</h3>
+            <h3 className="text-lg font-bold text-slate-900 mb-4">Rechazar Gasto</h3>
             <textarea
               value={rejectComment}
               onChange={(e) => setRejectComment(e.target.value)}
@@ -495,7 +491,7 @@ export default function AdminPanel() {
               className="w-full px-3 py-2 rounded-xl border border-gray-300 focus:ring-2 focus:ring-sky-500 outline-none text-gray-900 h-24 resize-none"
             />
             <div className="flex gap-3 mt-4">
-              <button onClick={() => { setRejectModal({ id: "", open: false }); setRejectComment(""); }} className="flex-1 py-2.5 rounded-xl border border-gray-300 text-gray-700 text-sm font-medium">Cancelar</button>
+              <button onClick={() => { setRejectModal({ id: "", open: false }); setRejectComment(""); }} className="flex-1 py-2.5 rounded-lg border border-slate-300 text-slate-700 text-sm font-medium hover:bg-slate-50">Cancelar</button>
               <button onClick={handleReject} className="flex-1 py-2.5 rounded-xl bg-red-600 text-white text-sm font-medium hover:bg-red-700">Rechazar</button>
             </div>
           </div>
@@ -507,7 +503,7 @@ export default function AdminPanel() {
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-2xl p-6 w-full max-w-sm">
             <h3 className="text-lg font-bold text-gray-900 mb-2">Confirmar Pago</h3>
-            <p className="text-sm text-gray-600 mb-4">
+            <p className="text-sm text-slate-600 mb-4">
               ¿Procesar el pago para <strong>{payConfirm.name}</strong>?
             </p>
             <div className="bg-green-50 border border-green-200 rounded-xl p-3 mb-4">
@@ -516,7 +512,7 @@ export default function AdminPanel() {
             </div>
             <p className="text-xs text-gray-400 mb-4">Se generará un comprobante PDF y se enviará por email.</p>
             <div className="flex gap-3">
-              <button onClick={() => setPayConfirm({ open: false, userId: "", name: "", total: 0, count: 0 })} className="flex-1 py-2.5 rounded-xl border border-gray-300 text-gray-700 text-sm font-medium">Cancelar</button>
+              <button onClick={() => setPayConfirm({ open: false, userId: "", name: "", total: 0, count: 0 })} className="flex-1 py-2.5 rounded-lg border border-slate-300 text-slate-700 text-sm font-medium hover:bg-slate-50">Cancelar</button>
               <button onClick={() => { setPayConfirm({ open: false, userId: "", name: "", total: 0, count: 0 }); handlePay(payConfirm.userId); }} className="flex-1 py-2.5 rounded-xl bg-green-600 text-white text-sm font-medium hover:bg-green-700">Confirmar Pago</button>
             </div>
           </div>
@@ -533,7 +529,7 @@ export default function AdminPanel() {
             </p>
             <div className="flex gap-3">
               <button onClick={() => setDeleteModal({ id: "", open: false })}
-                      className="flex-1 py-2.5 rounded-xl border border-gray-300 text-gray-700 text-sm font-medium">
+                      className="flex-1 py-2.5 rounded-lg border border-slate-300 text-slate-700 text-sm font-medium hover:bg-slate-50">
                 Cancelar
               </button>
               <button onClick={handleDelete}

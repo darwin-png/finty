@@ -133,14 +133,14 @@ export default function ReportsPage() {
   const hasFilters = userId !== "" || from !== getMonthStart() || to !== getToday();
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-slate-50">
       <Navbar />
       {toast && <Toast message={toast.message} type={toast.type} onClose={() => setToast(null)} />}
 
       <main className="max-w-5xl mx-auto p-4">
         {/* Header */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4">
-          <h1 className="text-xl font-bold text-gray-900">Reportes</h1>
+          <h1 className="text-xl font-bold text-slate-900">Reportes</h1>
           <div className="flex gap-2">
             <button onClick={() => handleExport("chipax")} className="px-3 py-2 bg-purple-600 text-white text-xs rounded-xl hover:bg-purple-700 font-medium">
               Chipax
@@ -163,7 +163,7 @@ export default function ReportsPage() {
                 type="date"
                 value={from}
                 onChange={(e) => setFrom(e.target.value)}
-                className="w-full px-3 py-2 rounded-xl border border-gray-300 text-sm text-gray-900 outline-none focus:ring-2 focus:ring-sky-500"
+                className="w-full px-3 py-2 rounded-xl border border-slate-300 text-sm text-slate-900 outline-none focus:ring-2 focus:ring-sky-500"
               />
             </div>
             <div>
@@ -172,7 +172,7 @@ export default function ReportsPage() {
                 type="date"
                 value={to}
                 onChange={(e) => setTo(e.target.value)}
-                className="w-full px-3 py-2 rounded-xl border border-gray-300 text-sm text-gray-900 outline-none focus:ring-2 focus:ring-sky-500"
+                className="w-full px-3 py-2 rounded-xl border border-slate-300 text-sm text-slate-900 outline-none focus:ring-2 focus:ring-sky-500"
               />
             </div>
             <div>
@@ -180,7 +180,7 @@ export default function ReportsPage() {
               <select
                 value={userId}
                 onChange={(e) => setUserId(e.target.value)}
-                className="w-full px-3 py-2 rounded-xl border border-gray-300 text-sm text-gray-900"
+                className="w-full px-3 py-2 rounded-xl border border-slate-300 text-sm text-slate-900"
               >
                 <option value="">Todos</option>
                 {data?.users.map((u) => (
@@ -190,7 +190,7 @@ export default function ReportsPage() {
             </div>
             <div className="flex items-end">
               {hasFilters && (
-                <button onClick={clearFilters} className="w-full px-3 py-2 rounded-xl border border-gray-300 text-sm text-gray-600 hover:bg-gray-50">
+                <button onClick={clearFilters} className="w-full px-3 py-2 rounded-xl border border-slate-300 text-sm text-slate-600 hover:bg-slate-50">
                   Limpiar filtros
                 </button>
               )}
@@ -234,8 +234,8 @@ export default function ReportsPage() {
             {/* Two columns: By User + By Category */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
               {/* By User */}
-              <div className="bg-white rounded-2xl p-4 shadow-sm border">
-                <h2 className="text-sm font-semibold text-gray-900 mb-3">Gastos por Usuario</h2>
+              <div className="bg-white rounded-xl p-5 shadow-sm border border-slate-200">
+                <h2 className="text-sm font-semibold text-slate-900 mb-3">Gastos por Usuario</h2>
                 {data.byUser.length === 0 ? (
                   <div className="text-center py-4 text-gray-400 text-sm">Sin datos</div>
                 ) : (
@@ -248,10 +248,10 @@ export default function ReportsPage() {
                         return (
                           <div key={item.userId}>
                             <div className="flex justify-between text-sm mb-1">
-                              <span className="text-gray-700 font-medium">{item.user?.name || "—"}</span>
-                              <span className="font-bold text-gray-900">{formatCLP(amount)}</span>
+                              <span className="text-slate-700 font-medium">{item.user?.name || "—"}</span>
+                              <span className="font-bold text-slate-900">{formatCLP(amount)}</span>
                             </div>
-                            <div className="w-full bg-gray-100 rounded-full h-2.5">
+                            <div className="w-full bg-slate-100 rounded-full h-2.5">
                               <div className="bg-sky-500 h-2.5 rounded-full transition-all" style={{ width: `${pct}%` }} />
                             </div>
                             <div className="flex justify-between text-xs text-gray-400 mt-0.5">
@@ -266,8 +266,8 @@ export default function ReportsPage() {
               </div>
 
               {/* By Category */}
-              <div className="bg-white rounded-2xl p-4 shadow-sm border">
-                <h2 className="text-sm font-semibold text-gray-900 mb-3">Gastos por Categoría</h2>
+              <div className="bg-white rounded-xl p-5 shadow-sm border border-slate-200">
+                <h2 className="text-sm font-semibold text-slate-900 mb-3">Gastos por Categoría</h2>
                 {data.byCategory.length === 0 ? (
                   <div className="text-center py-4 text-gray-400 text-sm">Sin datos</div>
                 ) : (
@@ -280,10 +280,10 @@ export default function ReportsPage() {
                         return (
                           <div key={item.category}>
                             <div className="flex justify-between text-sm mb-1">
-                              <span className="text-gray-700 font-medium">{categoryLabels[item.category] || item.category}</span>
-                              <span className="font-bold text-gray-900">{formatCLP(amount)}</span>
+                              <span className="text-slate-700 font-medium">{categoryLabels[item.category] || item.category}</span>
+                              <span className="font-bold text-slate-900">{formatCLP(amount)}</span>
                             </div>
-                            <div className="w-full bg-gray-100 rounded-full h-2.5">
+                            <div className="w-full bg-slate-100 rounded-full h-2.5">
                               <div className="bg-blue-500 h-2.5 rounded-full transition-all" style={{ width: `${pct}%` }} />
                             </div>
                             <div className="flex justify-between text-xs text-gray-400 mt-0.5">
@@ -300,7 +300,7 @@ export default function ReportsPage() {
 
             {/* By Month */}
             <div className="bg-white rounded-2xl p-4 shadow-sm border mb-4">
-              <h2 className="text-sm font-semibold text-gray-900 mb-3">Evolución Mensual</h2>
+              <h2 className="text-sm font-semibold text-slate-900 mb-3">Evolución Mensual</h2>
               {data.byMonth.length === 0 ? (
                 <div className="text-center py-4 text-gray-400 text-sm">Sin datos</div>
               ) : (
@@ -320,11 +320,11 @@ export default function ReportsPage() {
                         const pct = maxTotal > 0 ? (item.total / maxTotal) * 100 : 0;
                         return (
                           <tr key={item.month}>
-                            <td className="py-2.5 text-sm font-medium text-gray-900">{formatMonth(item.month)}</td>
+                            <td className="py-2.5 text-sm font-medium text-slate-900">{formatMonth(item.month)}</td>
                             <td className="py-2.5 text-sm text-gray-500 text-right">{item.count}</td>
-                            <td className="py-2.5 text-sm font-bold text-gray-900 text-right">{formatCLP(item.total)}</td>
+                            <td className="py-2.5 text-sm font-bold text-slate-900 text-right">{formatCLP(item.total)}</td>
                             <td className="py-2.5 pl-4">
-                              <div className="w-full bg-gray-100 rounded-full h-2">
+                              <div className="w-full bg-slate-100 rounded-full h-2">
                                 <div className="bg-gray-800 h-2 rounded-full transition-all" style={{ width: `${pct}%` }} />
                               </div>
                             </td>
@@ -338,8 +338,8 @@ export default function ReportsPage() {
             </div>
 
             {/* Payment History */}
-            <div className="bg-white rounded-2xl p-4 shadow-sm border">
-              <h2 className="text-sm font-semibold text-gray-900 mb-3">Historial de Pagos</h2>
+            <div className="bg-white rounded-xl p-5 shadow-sm border border-slate-200">
+              <h2 className="text-sm font-semibold text-slate-900 mb-3">Historial de Pagos</h2>
               {data.payments.length === 0 ? (
                 <div className="text-center py-4 text-gray-400 text-sm">No hay pagos registrados en este período</div>
               ) : (
@@ -351,7 +351,7 @@ export default function ReportsPage() {
                         className="w-full flex items-center justify-between p-3 bg-blue-50 hover:bg-blue-100 transition-colors"
                       >
                         <div className="text-left">
-                          <div className="text-sm font-medium text-gray-900">{payment.userName}</div>
+                          <div className="text-sm font-medium text-slate-900">{payment.userName}</div>
                           <div className="text-xs text-gray-500">
                             {payment.ref} · {payment.paidAt ? formatDate(payment.paidAt) : "—"} · {payment.count} rendiciones
                           </div>
@@ -387,17 +387,17 @@ export default function ReportsPage() {
                               <tbody className="divide-y divide-gray-100">
                                 {payment.expenses.map((exp) => (
                                   <tr key={exp.id}>
-                                    <td className="py-1.5 text-gray-700">{formatDate(exp.date)}</td>
-                                    <td className="py-1.5 text-gray-700">{categoryLabels[exp.category] || exp.category}</td>
-                                    <td className="py-1.5 text-gray-700">{exp.proveedor || "—"}</td>
-                                    <td className="py-1.5 text-gray-700">{exp.tipoDocumento || "—"}</td>
-                                    <td className="py-1.5 text-gray-900 text-right font-medium">{formatCLP(exp.amount)}</td>
+                                    <td className="py-1.5 text-slate-700">{formatDate(exp.date)}</td>
+                                    <td className="py-1.5 text-slate-700">{categoryLabels[exp.category] || exp.category}</td>
+                                    <td className="py-1.5 text-slate-700">{exp.proveedor || "—"}</td>
+                                    <td className="py-1.5 text-slate-700">{exp.tipoDocumento || "—"}</td>
+                                    <td className="py-1.5 text-slate-900 text-right font-medium">{formatCLP(exp.amount)}</td>
                                   </tr>
                                 ))}
                               </tbody>
                               <tfoot>
                                 <tr className="border-t">
-                                  <td colSpan={4} className="py-2 font-semibold text-gray-900">Total</td>
+                                  <td colSpan={4} className="py-2 font-semibold text-slate-900">Total</td>
                                   <td className="py-2 text-right font-bold text-blue-700">{formatCLP(payment.total)}</td>
                                 </tr>
                               </tfoot>
