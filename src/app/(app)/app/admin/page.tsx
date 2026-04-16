@@ -378,22 +378,22 @@ export default function AdminPanel() {
                         )}
                         {exp.status === "PENDIENTE" && (
                           <>
-                            <button onClick={() => handleApprove(exp.id)} className="text-xs bg-green-600 text-white px-2.5 py-1.5 rounded-lg hover:bg-green-700">Aprobar</button>
-                            <button onClick={() => setRejectModal({ id: exp.id, open: true })} className="text-xs bg-red-600 text-white px-2.5 py-1.5 rounded-lg hover:bg-red-700">Rechazar</button>
+                            <button onClick={() => handleApprove(exp.id)} className="text-xs bg-emerald-500 text-white px-2.5 py-1.5 rounded-lg hover:bg-emerald-600">Aprobar</button>
+                            <button onClick={() => setRejectModal({ id: exp.id, open: true })} className="text-xs bg-rose-500 text-white px-2.5 py-1.5 rounded-lg hover:bg-rose-600">Rechazar</button>
                           </>
                         )}
                         {exp.status === "APROBADO" && (
                           <button
                             onClick={() => handleMarkPaid(exp.id)}
                             disabled={markingPaid === exp.id}
-                            className="text-xs bg-green-600 text-white px-3 py-1 rounded-lg hover:bg-green-700 disabled:opacity-50 disabled:cursor-wait font-medium"
+                            className="text-xs bg-emerald-500 text-white px-3 py-1 rounded-lg hover:bg-emerald-600 disabled:opacity-50 disabled:cursor-wait font-medium"
                           >
                             {markingPaid === exp.id ? "Pagando..." : "✓ Pagada"}
                           </button>
                         )}
                         <button
                           onClick={() => setDeleteModal({ id: exp.id, open: true })}
-                          className="text-xs bg-red-600 text-white px-2.5 py-1.5 rounded-lg hover:bg-red-700"
+                          className="text-xs bg-rose-400 text-white px-2.5 py-1.5 rounded-lg hover:bg-rose-500"
                         >
                           Eliminar
                         </button>
@@ -454,18 +454,18 @@ export default function AdminPanel() {
                           <div className="flex gap-1 justify-center flex-wrap">
                             {exp.status === "PENDIENTE" && (
                               <>
-                                <button onClick={() => handleApprove(exp.id)} className="text-xs bg-green-600 text-white px-2 py-1 rounded-lg hover:bg-green-700">Aprobar</button>
-                                <button onClick={() => setRejectModal({ id: exp.id, open: true })} className="text-xs bg-red-600 text-white px-2.5 py-1.5 rounded-lg hover:bg-red-700">Rechazar</button>
+                                <button onClick={() => handleApprove(exp.id)} className="text-xs bg-emerald-500 text-white px-2.5 py-1 rounded-lg hover:bg-emerald-600 font-medium">Aprobar</button>
+                                <button onClick={() => setRejectModal({ id: exp.id, open: true })} className="text-xs bg-rose-500 text-white px-2.5 py-1 rounded-lg hover:bg-rose-600 font-medium">Rechazar</button>
                               </>
                             )}
                             {exp.status === "APROBADO" && (
                               <button onClick={() => handleMarkPaid(exp.id)} disabled={markingPaid === exp.id}
-                                      className="text-xs bg-green-600 text-white px-2 py-1 rounded-lg hover:bg-green-700 disabled:opacity-50 disabled:cursor-wait font-medium">
+                                      className="text-xs bg-emerald-500 text-white px-2.5 py-1 rounded-lg hover:bg-emerald-600 disabled:opacity-50 disabled:cursor-wait font-medium">
                                 {markingPaid === exp.id ? "Pagando..." : "✓ Pagada"}
                               </button>
                             )}
                             <button onClick={() => setDeleteModal({ id: exp.id, open: true })}
-                                    className="text-xs bg-red-600 text-white px-2.5 py-1.5 rounded-lg hover:bg-red-700">
+                                    className="text-xs bg-rose-400 text-white px-2.5 py-1 rounded-lg hover:bg-rose-500 font-medium">
                               Eliminar
                             </button>
                           </div>
