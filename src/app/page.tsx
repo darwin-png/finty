@@ -8,7 +8,7 @@ export default function LandingPage() {
       <header className="fixed top-0 w-full bg-white/95 backdrop-blur-sm border-b border-gray-100 z-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 flex items-center justify-between h-16">
           <div className="flex items-center gap-8">
-            <Link href="/"><Image src="/logo.png" alt="Finty" width={240} height={80} className="h-14 sm:h-[68px] w-auto" /></Link>
+            <Link href="/"><Image src="/logo.png" alt="Finty" width={240} height={80} className="h-7 sm:h-8 w-auto" /></Link>
             <nav className="hidden md:flex items-center gap-6">
               <a href="#como-funciona" className="text-sm text-gray-600 hover:text-gray-900 transition-colors">Cómo Funciona</a>
               <a href="#funciones" className="text-sm text-gray-600 hover:text-gray-900 transition-colors">Funciones</a>
@@ -380,7 +380,7 @@ export default function LandingPage() {
         <div className="max-w-6xl mx-auto">
           <div className="grid sm:grid-cols-4 gap-8 mb-10">
             <div>
-              <Image src="/logo.png" alt="Finty" width={200} height={64} className="h-14 w-auto" />
+              <Image src="/logo.png" alt="Finty" width={200} height={64} className="h-7 w-auto" />
               <p className="mt-2 text-sm leading-relaxed">Sistema de rendición de gastos para empresas en Chile y Latinoamérica.</p>
             </div>
             <div>

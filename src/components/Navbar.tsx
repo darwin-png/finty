@@ -90,7 +90,7 @@ export default function Navbar() {
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
           <Link href={isSuperAdmin ? "/app/superadmin" : isAdmin ? "/app/admin" : "/app/dashboard"} className="flex items-center gap-3">
-            <Image src="/logo.png" alt={APP_NAME} width={240} height={80} className="h-14 sm:h-[68px] w-auto" priority />
+            <Image src="/logo.png" alt={APP_NAME} width={140} height={42} className="h-7 sm:h-8 w-auto" priority />
             {plan === "FREE" && (
               <span className="text-xs bg-amber-100 text-amber-700 px-2 py-0.5 rounded-md font-medium">FREE</span>
             )}
