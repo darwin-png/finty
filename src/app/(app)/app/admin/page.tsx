@@ -52,6 +52,15 @@ export default function AdminPanel() {
   const [expandedRejectModal, setExpandedRejectModal] = useState(false);
   const [expandedPayConfirm, setExpandedPayConfirm] = useState(false);
   const [expandedDeleteModal, setExpandedDeleteModal] = useState(false);
+  const [collapsedGroups, setCollapsedGroups] = useState<Set<string>>(new Set());
+
+  const toggleGroup = (userId: string) => {
+    setCollapsedGroups(prev => {
+      const next = new Set(prev);
+      next.has(userId) ? next.delete(userId) : next.add(userId);
+      return next;
+    });
+  };
 
   // Auth guard: redirect non-admins
   useEffect(() => {
@@ -247,7 +256,7 @@ export default function AdminPanel() {
   if (status === "authenticated" && session?.user?.role !== "ADMINISTRADOR") return null;
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-slate-50">
       <Navbar />
       {toast && <Toast message={toast.message} type={toast.type} onClose={() => setToast(null)} />}
 
@@ -256,13 +265,13 @@ export default function AdminPanel() {
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4">
           <h1 className="text-xl font-bold text-gray-900">Panel de Administración</h1>
           <div className="flex gap-2">
-            <button onClick={() => handleExport("chipax")} className="px-3 py-2 bg-purple-600 text-white text-xs rounded-xl hover:bg-purple-700 font-medium">
+            <button onClick={() => handleExport("chipax")} className="px-2.5 py-1.5 text-xs border border-slate-200 text-slate-600 rounded-lg hover:bg-slate-50 font-medium">
               Chipax
             </button>
-            <button onClick={() => handleExport("xlsx")} className="px-3 py-2 bg-green-600 text-white text-xs rounded-xl hover:bg-green-700">
+            <button onClick={() => handleExport("xlsx")} className="px-2.5 py-1.5 text-xs border border-slate-200 text-slate-600 rounded-lg hover:bg-slate-50">
               Excel
             </button>
-            <button onClick={() => handleExport("csv")} className="px-3 py-2 bg-blue-600 text-white text-xs rounded-xl hover:bg-blue-700">
+            <button onClick={() => handleExport("csv")} className="px-2.5 py-1.5 text-xs border border-slate-200 text-slate-600 rounded-lg hover:bg-slate-50">
               CSV
             </button>
           </div>
@@ -270,25 +279,25 @@ export default function AdminPanel() {
 
         {/* KPIs */}
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-4">
-          <div className="bg-amber-50 border border-amber-200 rounded-xl p-5">
-            <div className="text-xs text-yellow-600 font-medium">Pendientes</div>
-            <div className="text-lg font-bold text-yellow-800">{formatCLP(totalPendiente)}</div>
-            <div className="text-xs text-yellow-600">{pendientes.length} gastos</div>
+          <div className="bg-white border border-slate-200 border-l-4 border-l-amber-400 rounded-xl p-4">
+            <div className="text-xs text-slate-500 font-medium">Pendientes</div>
+            <div className="text-lg font-bold text-slate-900">{formatCLP(totalPendiente)}</div>
+            <div className="text-xs text-amber-600">{pendientes.length} gastos</div>
           </div>
-          <div className="bg-green-50 border border-green-200 rounded-xl p-5">
-            <div className="text-xs text-green-600 font-medium">Por Pagar</div>
-            <div className="text-lg font-bold text-green-800">{formatCLP(totalAprobado)}</div>
-            <div className="text-xs text-green-600">{aprobados.length} gastos</div>
+          <div className="bg-white border border-slate-200 border-l-4 border-l-emerald-400 rounded-xl p-4">
+            <div className="text-xs text-slate-500 font-medium">Por Pagar</div>
+            <div className="text-lg font-bold text-slate-900">{formatCLP(totalAprobado)}</div>
+            <div className="text-xs text-emerald-600">{aprobados.length} gastos</div>
           </div>
-          <div className="bg-blue-50 border border-blue-200 rounded-xl p-5">
-            <div className="text-xs text-blue-600 font-medium">Pagado</div>
-            <div className="text-lg font-bold text-blue-800">{formatCLP(totalPagado)}</div>
-            <div className="text-xs text-blue-600">{pagados.length} gastos</div>
+          <div className="bg-white border border-slate-200 border-l-4 border-l-[#4A90D9] rounded-xl p-4">
+            <div className="text-xs text-slate-500 font-medium">Pagado</div>
+            <div className="text-lg font-bold text-slate-900">{formatCLP(totalPagado)}</div>
+            <div className="text-xs text-[#4A90D9]">{pagados.length} gastos</div>
           </div>
-          <div className="bg-red-50 border border-red-200 rounded-xl p-5">
-            <div className="text-xs text-red-600 font-medium">Rechazado</div>
-            <div className="text-lg font-bold text-red-800">{formatCLP(totalRechazado)}</div>
-            <div className="text-xs text-red-600">{rechazados.length} gastos</div>
+          <div className="bg-white border border-slate-200 border-l-4 border-l-rose-400 rounded-xl p-4">
+            <div className="text-xs text-slate-500 font-medium">Rechazado</div>
+            <div className="text-lg font-bold text-slate-900">{formatCLP(totalRechazado)}</div>
+            <div className="text-xs text-rose-500">{rechazados.length} gastos</div>
           </div>
         </div>
 
@@ -298,16 +307,16 @@ export default function AdminPanel() {
             <h2 className="text-sm font-semibold text-gray-900 mb-3">Pagar por Colaborador</h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
               {approvedByUser.map((u) => (
-                <div key={u.userId} className="bg-green-50 border border-green-200 rounded-xl p-3 flex items-center justify-between">
+                <div key={u.userId} className="bg-white border border-slate-200 border-l-4 border-l-emerald-400 rounded-xl p-3 flex items-center justify-between">
                   <div>
-                    <div className="text-sm font-medium text-gray-900">{u.name}</div>
-                    <div className="text-lg font-bold text-green-700">{formatCLP(u.total)}</div>
-                    <div className="text-xs text-gray-500">{u.count} rendiciones</div>
+                    <div className="text-sm font-medium text-slate-900">{u.name}</div>
+                    <div className="text-lg font-bold text-emerald-700">{formatCLP(u.total)}</div>
+                    <div className="text-xs text-slate-500">{u.count} rendiciones</div>
                   </div>
                   <button
                     onClick={() => setPayConfirm({ open: true, userId: u.userId, name: u.name, total: u.total, count: u.count })}
                     disabled={paying === u.userId}
-                    className="ml-3 px-4 py-2 bg-green-600 text-white text-sm font-medium rounded-lg hover:bg-green-700 disabled:opacity-50 disabled:cursor-wait"
+                    className="ml-3 px-4 py-2 bg-[#4A90D9] text-white text-sm font-medium rounded-lg hover:bg-[#3a7bc8] disabled:opacity-50 disabled:cursor-wait"
                   >
                     {paying === u.userId ? "Pagando..." : "Pagar"}
                   </button>
@@ -341,67 +350,84 @@ export default function AdminPanel() {
           <>
             {/* Mobile cards grouped by user */}
             <div className="sm:hidden space-y-3">
-              {currentGrouped.map((group) => (
-                <div key={group.userId}>
-                  {/* User header card */}
-                  <div className="bg-sky-50 border border-sky-200 rounded-2xl p-3 mb-2">
-                    <div className="text-sm font-semibold text-sky-900">{group.name}</div>
-                    <div className="text-xs text-sky-600">
-                      {group.items.length} rendiciones · {formatCLP(group.items.reduce((s, e) => s + e.amount, 0))}
-                    </div>
-                  </div>
-                  {/* Expense cards */}
-                  {group.items.map((exp) => (
-                    <div key={exp.id} className="bg-white rounded-2xl p-4 shadow-sm border">
-                      <div className="flex items-start justify-between mb-2">
+              {currentGrouped.map((group) => {
+                const groupTotal = group.items.reduce((s, e) => s + e.amount, 0);
+                const isCollapsed = collapsedGroups.has(group.userId);
+                return (
+                  <div key={group.userId}>
+                    {/* User header card — CLICKABLE */}
+                    <div
+                      onClick={() => toggleGroup(group.userId)}
+                      className="bg-white border border-slate-200 border-l-4 border-l-[#4A90D9] rounded-2xl p-3 mb-2 flex items-center justify-between cursor-pointer select-none"
+                    >
+                      <div className="flex items-center gap-2">
+                        <div className="w-7 h-7 rounded-full bg-[#4A90D9]/10 text-[#4A90D9] text-xs font-bold flex items-center justify-center flex-shrink-0">
+                          {group.name[0].toUpperCase()}
+                        </div>
                         <div>
-                          <div className="text-xs text-gray-500">{formatDate(exp.date)} · {categoryLabels[exp.category] || exp.category}</div>
-                          {exp.description && <p className="text-xs text-gray-400 mt-1">{exp.description}</p>}
-                          <div className="text-xs text-gray-400 mt-1">
-                            {exp.tipoDocumento && <span>{exp.tipoDocumento}</span>}
-                            {exp.proveedor && <span> · {exp.proveedor}</span>}
+                          <div className="text-sm font-semibold text-slate-900">{group.name}</div>
+                          <div className="text-xs text-slate-500">
+                            {group.items.length} rendiciones · {formatCLP(groupTotal)}
                           </div>
                         </div>
-                        <div className="text-right">
-                          <div className="font-bold text-gray-900">{formatCLP(exp.amount)}</div>
-                          <StatusBadge status={exp.status} />
-                        </div>
                       </div>
-                      {exp.comment && exp.status === "RECHAZADO" && (
-                        <div className="bg-red-50 text-red-600 text-xs p-2 rounded-lg mb-2">
-                          <span className="font-medium">Motivo: </span>{exp.comment}
-                        </div>
-                      )}
-                      <div className="flex flex-wrap gap-2 pt-2 border-t">
-                        {exp.hasReceipt && (
-                          <a href={`/api/files/${exp.id}`} target="_blank" rel="noopener noreferrer" className="text-xs text-blue-600 hover:underline">Ver comprobante</a>
-                        )}
-                        {exp.status === "PENDIENTE" && (
-                          <>
-                            <button onClick={() => handleApprove(exp.id)} className="text-xs bg-emerald-500 text-white px-2.5 py-1.5 rounded-lg hover:bg-emerald-600">Aprobar</button>
-                            <button onClick={() => setRejectModal({ id: exp.id, open: true })} className="text-xs bg-rose-500 text-white px-2.5 py-1.5 rounded-lg hover:bg-rose-600">Rechazar</button>
-                          </>
-                        )}
-                        {exp.status === "APROBADO" && (
-                          <button
-                            onClick={() => handleMarkPaid(exp.id)}
-                            disabled={markingPaid === exp.id}
-                            className="text-xs bg-emerald-500 text-white px-3 py-1 rounded-lg hover:bg-emerald-600 disabled:opacity-50 disabled:cursor-wait font-medium"
-                          >
-                            {markingPaid === exp.id ? "Pagando..." : "✓ Pagada"}
-                          </button>
-                        )}
-                        <button
-                          onClick={() => setDeleteModal({ id: exp.id, open: true })}
-                          className="text-xs bg-rose-400 text-white px-2.5 py-1.5 rounded-lg hover:bg-rose-500"
-                        >
-                          Eliminar
-                        </button>
-                      </div>
+                      <svg className={`w-4 h-4 text-slate-400 transition-transform duration-200 flex-shrink-0 ${isCollapsed ? '-rotate-90' : 'rotate-0'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                      </svg>
                     </div>
-                  ))}
-                </div>
-              ))}
+                    {/* Expense cards — condicional */}
+                    {!isCollapsed && group.items.map((exp) => (
+                      <div key={exp.id} className="bg-white rounded-2xl p-4 shadow-sm border border-slate-200 mb-2">
+                        <div className="flex items-start justify-between mb-2">
+                          <div>
+                            <div className="text-xs text-slate-500">{formatDate(exp.date)} · {categoryLabels[exp.category] || exp.category}</div>
+                            {exp.description && <p className="text-xs text-slate-400 mt-1">{exp.description}</p>}
+                            <div className="text-xs text-slate-400 mt-1">
+                              {exp.tipoDocumento && <span>{exp.tipoDocumento}</span>}
+                              {exp.proveedor && <span> · {exp.proveedor}</span>}
+                            </div>
+                          </div>
+                          <div className="text-right">
+                            <div className="font-bold text-slate-900">{formatCLP(exp.amount)}</div>
+                            <StatusBadge status={exp.status} />
+                          </div>
+                        </div>
+                        {exp.comment && exp.status === "RECHAZADO" && (
+                          <div className="bg-rose-50 text-rose-600 text-xs p-2 rounded-lg mb-2">
+                            <span className="font-medium">Motivo: </span>{exp.comment}
+                          </div>
+                        )}
+                        <div className="flex flex-wrap gap-2 pt-2 border-t border-slate-100">
+                          {exp.hasReceipt && (
+                            <a href={`/api/files/${exp.id}`} target="_blank" rel="noopener noreferrer" className="text-xs text-[#4A90D9] hover:underline">Ver comprobante</a>
+                          )}
+                          {exp.status === "PENDIENTE" && (
+                            <>
+                              <button onClick={() => handleApprove(exp.id)} className="text-xs bg-emerald-50 text-emerald-700 px-2 py-1 rounded-md hover:bg-emerald-100 font-medium">Aprobar</button>
+                              <button onClick={() => setRejectModal({ id: exp.id, open: true })} className="text-xs bg-rose-50 text-rose-600 px-2 py-1 rounded-md hover:bg-rose-100">Rechazar</button>
+                            </>
+                          )}
+                          {exp.status === "APROBADO" && (
+                            <button
+                              onClick={() => handleMarkPaid(exp.id)}
+                              disabled={markingPaid === exp.id}
+                              className="text-xs bg-emerald-50 text-emerald-700 px-2 py-1 rounded-md hover:bg-emerald-100 disabled:opacity-50 disabled:cursor-wait font-medium"
+                            >
+                              {markingPaid === exp.id ? "Pagando..." : "✓ Pagada"}
+                            </button>
+                          )}
+                          <button
+                            onClick={() => setDeleteModal({ id: exp.id, open: true })}
+                            className="text-xs text-slate-400 hover:text-rose-500 transition-colors px-1"
+                          >
+                            Eliminar
+                          </button>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                );
+              })}
             </div>
 
             {/* Desktop table */}
@@ -421,59 +447,73 @@ export default function AdminPanel() {
                       <th className="px-4 py-3 text-center text-xs font-medium text-gray-500">Acciones</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y">
-                    {currentGrouped.map((group) => (
-                      <React.Fragment key={group.userId}>
-                        {/* Group header row */}
-                        <tr className="bg-slate-50 hover:bg-slate-100 border-l-2 border-l-\[#4A90D9\]">
-                          <td colSpan={9} className="px-4 py-3">
-                            <div className="text-sm font-semibold text-sky-900">{group.name}</div>
-                            <div className="text-xs text-sky-600">
-                              {group.items.length} rendiciones · {formatCLP(group.items.reduce((s, e) => s + e.amount, 0))}
-                            </div>
-                          </td>
-                        </tr>
-                        {/* Expense rows */}
-                        {group.items.map((exp) => (
-                          <tr key={exp.id} className="hover:bg-gray-50">
-                            <td className="px-4 py-3 text-sm text-gray-500 text-xs">—</td>
-                            <td className="px-4 py-3 text-sm text-gray-500">{formatDate(exp.date)}</td>
-                            <td className="px-4 py-3 text-sm text-gray-500">{categoryLabels[exp.category] || exp.category}</td>
-                            <td className="px-4 py-3 text-sm text-gray-500">{exp.proveedor || "—"}</td>
-                            <td className="px-4 py-3 text-sm text-gray-500 max-w-[200px] truncate">{exp.description || "—"}</td>
-                            <td className="px-4 py-3 text-sm text-gray-900 text-right font-medium">{formatCLP(exp.amount)}</td>
-                            <td className="px-4 py-3 text-center">
-                              {exp.hasReceipt ? (
-                                <a href={`/api/files/${exp.id}`} target="_blank" rel="noopener noreferrer" className="text-xs text-blue-600 hover:underline">Ver</a>
-                              ) : (
-                                <span className="text-xs text-gray-400">—</span>
-                          )}
-                        </td>
-                        <td className="px-4 py-3 text-center"><StatusBadge status={exp.status} /></td>
-                        <td className="px-4 py-3 text-center">
-                          <div className="flex gap-1 justify-center flex-wrap">
-                            {exp.status === "PENDIENTE" && (
-                              <>
-                                <button onClick={() => handleApprove(exp.id)} className="text-xs bg-emerald-500 text-white px-2.5 py-1 rounded-lg hover:bg-emerald-600 font-medium">Aprobar</button>
-                                <button onClick={() => setRejectModal({ id: exp.id, open: true })} className="text-xs bg-rose-500 text-white px-2.5 py-1 rounded-lg hover:bg-rose-600 font-medium">Rechazar</button>
-                              </>
-                            )}
-                            {exp.status === "APROBADO" && (
-                              <button onClick={() => handleMarkPaid(exp.id)} disabled={markingPaid === exp.id}
-                                      className="text-xs bg-emerald-500 text-white px-2.5 py-1 rounded-lg hover:bg-emerald-600 disabled:opacity-50 disabled:cursor-wait font-medium">
-                                {markingPaid === exp.id ? "Pagando..." : "✓ Pagada"}
-                              </button>
-                            )}
-                            <button onClick={() => setDeleteModal({ id: exp.id, open: true })}
-                                    className="text-xs bg-rose-400 text-white px-2.5 py-1 rounded-lg hover:bg-rose-500 font-medium">
-                              Eliminar
-                            </button>
-                          </div>
-                        </td>
+                  <tbody className="divide-y divide-slate-100">
+                    {currentGrouped.map((group) => {
+                      const groupTotal = group.items.reduce((s, e) => s + e.amount, 0);
+                      const isCollapsed = collapsedGroups.has(group.userId);
+                      return (
+                        <React.Fragment key={group.userId}>
+                          {/* Group header row — CLICKABLE */}
+                          <tr
+                            onClick={() => toggleGroup(group.userId)}
+                            className="bg-slate-50 hover:bg-slate-100 cursor-pointer select-none border-l-2 border-l-[#4A90D9]"
+                          >
+                            <td colSpan={9} className="px-4 py-3">
+                              <div className="flex items-center justify-between">
+                                <div className="flex items-center gap-2">
+                                  <div className="w-7 h-7 rounded-full bg-[#4A90D9]/10 text-[#4A90D9] text-xs font-bold flex items-center justify-center flex-shrink-0">
+                                    {group.name[0].toUpperCase()}
+                                  </div>
+                                  <div>
+                                    <span className="text-sm font-semibold text-slate-900">{group.name}</span>
+                                    <span className="text-xs text-slate-500 ml-2">{group.items.length} rendiciones · {formatCLP(groupTotal)}</span>
+                                  </div>
+                                </div>
+                                <svg className={`w-4 h-4 text-slate-400 transition-transform duration-200 ${isCollapsed ? '-rotate-90' : 'rotate-0'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                                </svg>
+                              </div>
+                            </td>
                           </tr>
-                        ))}
-                      </React.Fragment>
-                    ))}
+                          {/* Expense rows — condicional */}
+                          {!isCollapsed && group.items.map((exp) => (
+                            <tr key={exp.id} className="hover:bg-slate-50">
+                              <td className="px-4 py-3 text-xs text-slate-400">—</td>
+                              <td className="px-4 py-3 text-sm text-slate-500">{formatDate(exp.date)}</td>
+                              <td className="px-4 py-3 text-sm text-slate-500">{categoryLabels[exp.category] || exp.category}</td>
+                              <td className="px-4 py-3 text-sm text-slate-500">{exp.proveedor || "—"}</td>
+                              <td className="px-4 py-3 text-sm text-slate-500 max-w-[200px] truncate">{exp.description || "—"}</td>
+                              <td className="px-4 py-3 text-sm text-slate-900 text-right font-medium">{formatCLP(exp.amount)}</td>
+                              <td className="px-4 py-3 text-center">
+                                {exp.hasReceipt ? (
+                                  <a href={`/api/files/${exp.id}`} target="_blank" rel="noopener noreferrer" className="text-xs text-[#4A90D9] hover:underline">Ver</a>
+                                ) : (
+                                  <span className="text-xs text-slate-400">—</span>
+                                )}
+                              </td>
+                              <td className="px-4 py-3 text-center"><StatusBadge status={exp.status} /></td>
+                              <td className="px-4 py-3 text-center">
+                                <div className="flex gap-3 justify-center items-center">
+                                  {exp.status === "PENDIENTE" && (
+                                    <>
+                                      <button onClick={(e) => { e.stopPropagation(); handleApprove(exp.id); }} className="text-xs text-emerald-600 hover:text-emerald-700 font-medium">Aprobar</button>
+                                      <button onClick={(e) => { e.stopPropagation(); setRejectModal({ id: exp.id, open: true }); }} className="text-xs text-rose-500 hover:text-rose-600">Rechazar</button>
+                                    </>
+                                  )}
+                                  {exp.status === "APROBADO" && (
+                                    <button onClick={(e) => { e.stopPropagation(); handleMarkPaid(exp.id); }} disabled={markingPaid === exp.id}
+                                      className="text-xs bg-emerald-50 text-emerald-700 px-2 py-0.5 rounded-md hover:bg-emerald-100 font-medium disabled:opacity-50 disabled:cursor-wait">
+                                      {markingPaid === exp.id ? "Pagando..." : "✓ Pagada"}
+                                    </button>
+                                  )}
+                                  <button onClick={(e) => { e.stopPropagation(); setDeleteModal({ id: exp.id, open: true }); }} className="text-xs text-slate-400 hover:text-rose-500 transition-colors">Eliminar</button>
+                                </div>
+                              </td>
+                            </tr>
+                          ))}
+                        </React.Fragment>
+                      );
+                    })}
                   </tbody>
                 </table>
               </div>
