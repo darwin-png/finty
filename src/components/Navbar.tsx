@@ -87,10 +87,10 @@ export default function Navbar() {
   return (
     <header className="bg-white sticky top-0 z-50 border-b border-slate-200 shadow-sm">
       <div className="max-w-7xl mx-auto px-4">
-        <div className="flex items-center justify-between h-16">
+        <div className="flex items-center justify-between py-3">
           {/* Logo */}
           <Link href={isSuperAdmin ? "/app/superadmin" : isAdmin ? "/app/admin" : "/app/dashboard"} className="flex items-center gap-3">
-            <Image src="/logo.png" alt={APP_NAME} width={140} height={42} className="h-9 sm:h-10 w-auto" priority />
+            <Image src="/logo.png" alt={APP_NAME} width={400} height={120} className="h-[108px] sm:h-[120px] w-auto" priority />
             {plan === "FREE" && (
               <span className="text-xs bg-amber-100 text-amber-700 px-2 py-0.5 rounded-md font-medium">FREE</span>
             )}
