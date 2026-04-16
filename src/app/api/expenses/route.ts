@@ -21,6 +21,10 @@ export async function GET(req: NextRequest) {
   const isAdmin = session.user.role === "ADMINISTRADOR";
   const orgId = session.user.organizationId;
 
+  if (!orgId) {
+    return NextResponse.json({ error: "No autorizado" }, { status: 403 });
+  }
+
   const where: Record<string, unknown> = { organizationId: orgId };
 
   if (!isAdmin) {
@@ -72,6 +76,10 @@ export async function POST(req: NextRequest) {
 
   const orgId = session.user.organizationId;
   const plan = session.user.plan;
+
+  if (!orgId) {
+    return NextResponse.json({ error: "No autorizado" }, { status: 403 });
+  }
 
   // Check plan limits
   const limits = getPlanLimits(plan);

@@ -10,6 +10,11 @@ export async function GET(req: NextRequest) {
   }
 
   const orgId = session.user.organizationId;
+
+  if (!orgId) {
+    return NextResponse.json({ error: "No autorizado" }, { status: 403 });
+  }
+
   const { searchParams } = new URL(req.url);
   const from = searchParams.get("from");
   const to = searchParams.get("to");

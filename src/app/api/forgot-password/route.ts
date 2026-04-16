@@ -22,7 +22,7 @@ export async function POST(req: NextRequest) {
 
   if (!user || !user.active || !user.email) return successResponse;
   if (user.email.toLowerCase() !== email.toLowerCase()) return successResponse;
-  if (!user.organization.active) return successResponse;
+  if (!user.organization || !user.organization.active) return successResponse;
 
   // Generate temporary password
   const tempPassword = crypto.randomBytes(4).toString("hex"); // 8 chars hex

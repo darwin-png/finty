@@ -11,6 +11,7 @@ export default function Navbar() {
   const { data: session } = useSession();
   const pathname = usePathname();
   const isAdmin = session?.user?.role === "ADMINISTRADOR";
+  const isSuperAdmin = session?.user?.role === "SUPERADMIN";
   const plan = session?.user?.plan;
 
   const [showPasswordModal, setShowPasswordModal] = useState(false);
@@ -57,7 +58,9 @@ export default function Navbar() {
     setPwLoading(false);
   };
 
-  const navItems = isAdmin
+  const navItems = isSuperAdmin
+    ? [{ href: "/app/superadmin", label: "Administración" }]
+    : isAdmin
     ? [
         { href: "/app/admin", label: "Rendiciones" },
         { href: "/app/admin/reports", label: "Reportes" },
@@ -86,7 +89,7 @@ export default function Navbar() {
       <div className="max-w-7xl mx-auto px-4">
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
-          <Link href={isAdmin ? "/app/admin" : "/app/dashboard"} className="flex items-center gap-3">
+          <Link href={isSuperAdmin ? "/app/superadmin" : isAdmin ? "/app/admin" : "/app/dashboard"} className="flex items-center gap-3">
             <Image src="/logo.png" alt={APP_NAME} width={180} height={56} className="h-9 w-auto" priority />
             {plan === "FREE" && (
               <span className="text-xs bg-amber-100 text-amber-700 px-2 py-0.5 rounded-md font-medium">FREE</span>

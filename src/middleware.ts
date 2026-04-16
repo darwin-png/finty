@@ -6,6 +6,17 @@ export default withAuth(
     const { pathname } = req.nextUrl;
     const token = req.nextauth.token;
 
+    // SuperAdmin: solo puede acceder a /app/superadmin
+    if (token?.role === "SUPERADMIN" && !pathname.startsWith("/app/superadmin")) {
+      return NextResponse.redirect(new URL("/app/superadmin", req.url));
+    }
+
+    // Proteger rutas superadmin — solo SUPERADMIN
+    if (pathname.startsWith("/app/superadmin") && token?.role !== "SUPERADMIN") {
+      return NextResponse.redirect(new URL("/app/dashboard", req.url));
+    }
+
+    // Proteger rutas admin — solo ADMINISTRADOR
     if (pathname.startsWith("/app/admin") && token?.role !== "ADMINISTRADOR") {
       return NextResponse.redirect(new URL("/app/dashboard", req.url));
     }

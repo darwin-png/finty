@@ -12,6 +12,7 @@ datasource db {
 enum Role {
   COLABORADOR
   ADMINISTRADOR
+  SUPERADMIN
 
   @@schema("finty")
 }
@@ -56,8 +57,8 @@ model User {
   email          String?
   role           Role         @default(COLABORADOR)
   active         Boolean      @default(true)
-  organizationId String
-  organization   Organization @relation(fields: [organizationId], references: [id])
+  organizationId String?
+  organization   Organization? @relation(fields: [organizationId], references: [id])
   createdAt      DateTime     @default(now())
   updatedAt      DateTime     @updatedAt
   expenses       Expense[]

@@ -20,7 +20,8 @@ export const authOptions: AuthOptions = {
         });
 
         if (!user || !user.active) return null;
-        if (!user.organization.active) return null;
+        // SUPERADMIN has no organization
+        if (user.role !== "SUPERADMIN" && (!user.organization || !user.organization.active)) return null;
 
         const isValid = await bcryptjs.compare(credentials.password, user.password);
         if (!isValid) return null;
@@ -30,10 +31,10 @@ export const authOptions: AuthOptions = {
           name: user.name,
           email: user.username,
           role: user.role,
-          organizationId: user.organizationId,
-          organizationSlug: user.organization.slug,
-          organizationName: user.organization.name,
-          plan: user.organization.plan,
+          organizationId: user.organizationId ?? null,
+          organizationSlug: user.organization?.slug ?? null,
+          organizationName: user.organization?.name ?? null,
+          plan: user.organization?.plan ?? null,
         };
       },
     }),

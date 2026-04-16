@@ -13,6 +13,10 @@ export async function GET() {
 
   const orgId = session.user.organizationId;
 
+  if (!orgId) {
+    return NextResponse.json({ error: "No autorizado" }, { status: 403 });
+  }
+
   const users = await prisma.user.findMany({
     where: { organizationId: orgId },
     select: { id: true, username: true, name: true, email: true, role: true, active: true, createdAt: true },
@@ -30,6 +34,10 @@ export async function POST(req: NextRequest) {
 
   const orgId = session.user.organizationId;
   const plan = session.user.plan;
+
+  if (!orgId) {
+    return NextResponse.json({ error: "No autorizado" }, { status: 403 });
+  }
 
   // Check plan user limit
   const limits = getPlanLimits(plan);

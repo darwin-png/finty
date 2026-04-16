@@ -13,11 +13,11 @@ export const PLAN_LIMITS = {
 
 export type PlanKey = keyof typeof PLAN_LIMITS;
 
-export function getPlanLimits(plan: string) {
-  return PLAN_LIMITS[plan as PlanKey] || PLAN_LIMITS.FREE;
+export function getPlanLimits(plan: string | null) {
+  return PLAN_LIMITS[(plan as PlanKey) || "FREE"] || PLAN_LIMITS.FREE;
 }
 
-export function hasFeature(plan: string, feature: string) {
+export function hasFeature(plan: string | null, feature: string) {
   const limits = getPlanLimits(plan);
   return (limits.features as readonly string[]).includes(feature);
 }
