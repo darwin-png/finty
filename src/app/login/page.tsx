@@ -66,7 +66,7 @@ export default function LoginPage() {
     <div className="min-h-screen bg-gradient-to-br from-[#4A90D9] to-[#2E6AB5] flex items-center justify-center p-4">
       <div className="bg-white rounded-2xl shadow-2xl p-8 w-full max-w-sm">
         <div className="text-center mb-8">
-          <Image src="/logo.png" alt="Finty" width={180} height={54} className="mx-auto mb-4 h-10 w-auto" />
+          <Image src="/logo.png" alt="Finty" width={180} height={54} className="mx-auto mb-4 h-13 w-auto" />
           <p className="text-gray-500 text-sm mt-1">{APP_DESCRIPTION}</p>
         </div>
 
