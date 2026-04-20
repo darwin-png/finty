@@ -482,7 +482,7 @@ export default function AdminPanel() {
                               <td className="px-4 py-3 text-sm text-slate-500">{formatDate(exp.date)}</td>
                               <td className="px-4 py-3 text-sm text-slate-500">{categoryLabels[exp.category] || exp.category}</td>
                               <td className="px-4 py-3 text-sm text-slate-500">{exp.proveedor || "—"}</td>
-                              <td className="px-4 py-3 text-sm text-slate-500 max-w-[200px] truncate">{exp.description || "—"}</td>
+                              <td className="px-4 py-3 text-sm text-slate-500 min-w-[180px] max-w-[360px]"><span className="line-clamp-3">{exp.description || "—"}</span></td>
                               <td className="px-4 py-3 text-sm text-slate-900 text-right font-medium">{formatCLP(exp.amount)}</td>
                               <td className="px-4 py-3 text-center">
                                 {exp.hasReceipt ? (
